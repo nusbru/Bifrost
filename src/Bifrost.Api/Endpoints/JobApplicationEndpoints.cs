@@ -59,12 +59,9 @@ public static class JobApplicationEndpoints
     {
         try
         {
-            // TODO: Get userId from authenticated user context
-            var userId = Guid.NewGuid();
-
             var application = await applicationService.CreateApplicationAsync(
                 request.JobId,
-                userId);
+                request.UserId);
 
             var response = new JobApplicationResponse(
                 application.Id,

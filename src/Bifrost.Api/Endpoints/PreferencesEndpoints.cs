@@ -47,11 +47,8 @@ public static class PreferencesEndpoints
     {
         try
         {
-            // TODO: Get userId from authenticated user context
-            var userId = Guid.NewGuid();
-
             var preferences = await preferencesService.CreatePreferencesAsync(
-                userId,
+                request.UserId,
                 request.MinSalary,
                 request.MaxSalary,
                 request.PreferredJobTypes,

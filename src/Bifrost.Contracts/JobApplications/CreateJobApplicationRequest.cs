@@ -4,4 +4,5 @@ namespace Bifrost.Contracts.JobApplications;
 /// Request contract for creating a new job application.
 /// </summary>
 public record CreateJobApplicationRequest(
+    Guid UserId,
     long JobId);

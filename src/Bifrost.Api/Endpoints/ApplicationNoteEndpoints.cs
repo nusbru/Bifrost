@@ -54,12 +54,9 @@ public static class ApplicationNoteEndpoints
     {
         try
         {
-            // TODO: Get userId from authenticated user context
-            var userId = Guid.NewGuid();
-
             var note = await noteService.CreateNoteAsync(
                 applicationId,
-                userId,
+                request.UserId,
                 request.Note);
 
             var response = new ApplicationNoteResponse(

@@ -31,7 +31,7 @@ public class JobApplicationEndpointsTests
         // Arrange
         var jobId = 1L;
         var userId = Guid.NewGuid();
-        var request = new CreateJobApplicationRequest(jobId);
+        var request = new CreateJobApplicationRequest(userId, jobId);
 
         var application = new JobApplication
         {

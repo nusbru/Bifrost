@@ -31,7 +31,7 @@ public class PreferencesEndpointsTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var request = new CreatePreferencesRequest(50000m, 100000m, "FullTime", "US");
+        var request = new CreatePreferencesRequest(userId, 50000m, 100000m, "FullTime", "US");
 
         var preferences = new Preferences
         {

@@ -53,11 +53,8 @@ public static class JobEndpoints
     {
         try
         {
-            // TODO: Get userId from authenticated user context
-            var userId = Guid.NewGuid();
-
             var job = await jobService.CreateJobAsync(
-                userId,
+                request.UserId,
                 request.Title,
                 request.Company,
                 request.Location,

@@ -30,7 +30,9 @@ public class JobEndpointsTests
     public async Task CreateJob_WithValidRequest_ReturnsCreatedResult()
     {
         // Arrange
+        var userId = Guid.NewGuid();
         var request = new CreateJobRequest(
+            userId,
             "Senior Developer",
             "Google",
             "New York",
@@ -49,12 +51,12 @@ public class JobEndpointsTests
             Description = request.Description,
             OfferSponsorship = request.OfferSponsorship,
             OfferRelocation = request.OfferRelocation,
-            SupabaseUserId = Guid.NewGuid(),
+            SupabaseUserId = userId,
             CreatedAt = DateTime.UtcNow
         };
 
         _jobServiceMock.CreateJobAsync(
-            Arg.Any<Guid>(),
+            userId,
             request.Title,
             request.Company,
             request.Location,
@@ -68,7 +70,7 @@ public class JobEndpointsTests
         var response = await _app.Services
             .GetRequiredService<IJobService>()
             .CreateJobAsync(
-                job.SupabaseUserId,
+                userId,
                 request.Title,
                 request.Company,
                 request.Location,
@@ -89,7 +91,9 @@ public class JobEndpointsTests
     public async Task CreateJob_WithInvalidTitle_ThrowsArgumentException()
     {
         // Arrange
+        var userId = Guid.NewGuid();
         var request = new CreateJobRequest(
+            userId,
             "",
             "Google",
             "New York",
@@ -99,7 +103,7 @@ public class JobEndpointsTests
             false);
 
         _jobServiceMock.CreateJobAsync(
-            Arg.Any<Guid>(),
+            userId,
             Arg.Any<string>(),
             Arg.Any<string>(),
             Arg.Any<string>(),
@@ -114,7 +118,7 @@ public class JobEndpointsTests
             _app.Services
                 .GetRequiredService<IJobService>()
                 .CreateJobAsync(
-                    Guid.NewGuid(),
+                    userId,
                     request.Title,
                     request.Company,
                     request.Location,

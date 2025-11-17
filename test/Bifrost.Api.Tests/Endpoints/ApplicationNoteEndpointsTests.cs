@@ -31,7 +31,7 @@ public class ApplicationNoteEndpointsTests
         // Arrange
         var applicationId = 1L;
         var userId = Guid.NewGuid();
-        var request = new CreateApplicationNoteRequest("This is a test note");
+        var request = new CreateApplicationNoteRequest(userId, "This is a test note");
 
         var note = new ApplicationNote
         {
