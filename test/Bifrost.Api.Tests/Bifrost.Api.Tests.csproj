@@ -12,6 +12,14 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
         <PackageReference Include="xunit" Version="2.9.2"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
+        <PackageReference Include="NSubstitute" Version="5.1.0"/>
+        <PackageReference Include="FluentAssertions" Version="6.12.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../../src/Bifrost.Api/Bifrost.Api.csproj"/>
+        <ProjectReference Include="../../src/Bifrost.Core/Bifrost.Core.csproj"/>
+        <ProjectReference Include="../../src/Bifrost.Contracts/Bifrost.Contracts.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
