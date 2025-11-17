@@ -46,7 +46,7 @@ public class JobApplicationServiceTests
     public async Task CreateApplicationAsync_WithInvalidJobId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobApplicationService.CreateApplicationAsync(0, Guid.NewGuid()));
     }
 
@@ -54,7 +54,7 @@ public class JobApplicationServiceTests
     public async Task CreateApplicationAsync_WithEmptyUserId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobApplicationService.CreateApplicationAsync(1, Guid.Empty));
     }
 
@@ -65,7 +65,7 @@ public class JobApplicationServiceTests
         _jobRepositoryMock.GetById(999).Returns((Job?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _jobApplicationService.CreateApplicationAsync(999, Guid.NewGuid()));
     }
 
@@ -93,7 +93,7 @@ public class JobApplicationServiceTests
     public async Task UpdateApplicationStatusAsync_WithInvalidApplicationId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobApplicationService.UpdateApplicationStatusAsync(0, JobApplicationStatus.Applied));
     }
 
@@ -104,7 +104,7 @@ public class JobApplicationServiceTests
         _applicationRepositoryMock.GetById(999).Returns((JobApplication?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _jobApplicationService.UpdateApplicationStatusAsync(999, JobApplicationStatus.Applied));
     }
 
@@ -129,7 +129,7 @@ public class JobApplicationServiceTests
         _applicationRepositoryMock.GetById(999).Returns((JobApplication?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _jobApplicationService.DeleteApplicationAsync(999));
     }
 
@@ -185,7 +185,7 @@ public class JobApplicationServiceTests
     public async Task GetUserApplicationsAsync_WithEmptyUserId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobApplicationService.GetUserApplicationsAsync(Guid.Empty));
     }
 
@@ -214,7 +214,7 @@ public class JobApplicationServiceTests
     public async Task GetJobApplicationsAsync_WithInvalidJobId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobApplicationService.GetJobApplicationsAsync(0));
     }
 }

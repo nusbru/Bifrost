@@ -32,7 +32,7 @@ public class JobServiceTests
         const bool offerRelocation = false;
 
         // Act
-        var result = await _jobService.CreateJobAsync(userId, title, company, location, 
+        var result = await _jobService.CreateJobAsync(userId, title, company, location,
             jobType, description, offerSponsorship, offerRelocation);
 
         // Assert
@@ -53,7 +53,7 @@ public class JobServiceTests
     public async Task CreateJobAsync_WithEmptyUserId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobService.CreateJobAsync(Guid.Empty, "Title", "Company", "Loc", 0, "Desc", true, true));
     }
 
@@ -61,7 +61,7 @@ public class JobServiceTests
     public async Task CreateJobAsync_WithNullTitle_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobService.CreateJobAsync(Guid.NewGuid(), "", "Company", "Loc", 0, "Desc", true, true));
     }
 
@@ -69,7 +69,7 @@ public class JobServiceTests
     public async Task CreateJobAsync_WithNullCompany_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobService.CreateJobAsync(Guid.NewGuid(), "Title", "", "Loc", 0, "Desc", true, true));
     }
 
@@ -77,8 +77,8 @@ public class JobServiceTests
     public async Task UpdateJobAsync_WithValidData_UpdatesJobSuccessfully()
     {
         // Arrange
-        var existingJob = new Job 
-        { 
+        var existingJob = new Job
+        {
             Id = 1,
             Title = "Old Title",
             Company = "Old Company",
@@ -101,7 +101,7 @@ public class JobServiceTests
     public async Task UpdateJobAsync_WithInvalidJobId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobService.UpdateJobAsync(0, "Title", "Company", "Loc", "Desc"));
     }
 
@@ -112,7 +112,7 @@ public class JobServiceTests
         _jobRepositoryMock.GetById(999).Returns((Job?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _jobService.UpdateJobAsync(999, "Title", "Company", "Loc", "Desc"));
     }
 
@@ -137,7 +137,7 @@ public class JobServiceTests
         _jobRepositoryMock.GetById(999).Returns((Job?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _jobService.DeleteJobAsync(999));
     }
 
@@ -193,7 +193,7 @@ public class JobServiceTests
     public async Task GetUserJobsAsync_WithEmptyUserId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _jobService.GetUserJobsAsync(Guid.Empty));
     }
 }

@@ -45,7 +45,7 @@ public class ApplicationNoteServiceTests
     public async Task CreateNoteAsync_WithInvalidApplicationId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _applicationNoteService.CreateNoteAsync(0, Guid.NewGuid(), "Note"));
     }
 
@@ -53,7 +53,7 @@ public class ApplicationNoteServiceTests
     public async Task CreateNoteAsync_WithEmptyUserId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _applicationNoteService.CreateNoteAsync(1, Guid.Empty, "Note"));
     }
 
@@ -61,7 +61,7 @@ public class ApplicationNoteServiceTests
     public async Task CreateNoteAsync_WithEmptyNoteText_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _applicationNoteService.CreateNoteAsync(1, Guid.NewGuid(), ""));
     }
 
@@ -72,7 +72,7 @@ public class ApplicationNoteServiceTests
         _applicationRepositoryMock.GetById(999).Returns((JobApplication?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _applicationNoteService.CreateNoteAsync(999, Guid.NewGuid(), "Note"));
     }
 
@@ -94,7 +94,7 @@ public class ApplicationNoteServiceTests
     public async Task UpdateNoteAsync_WithInvalidNoteId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _applicationNoteService.UpdateNoteAsync(0, "Text"));
     }
 
@@ -102,7 +102,7 @@ public class ApplicationNoteServiceTests
     public async Task UpdateNoteAsync_WithEmptyNoteText_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _applicationNoteService.UpdateNoteAsync(1, ""));
     }
 
@@ -113,7 +113,7 @@ public class ApplicationNoteServiceTests
         _noteRepositoryMock.GetById(999).Returns((ApplicationNote?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _applicationNoteService.UpdateNoteAsync(999, "Text"));
     }
 
@@ -138,7 +138,7 @@ public class ApplicationNoteServiceTests
         _noteRepositoryMock.GetById(999).Returns((ApplicationNote?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _applicationNoteService.DeleteNoteAsync(999));
     }
 
@@ -194,7 +194,7 @@ public class ApplicationNoteServiceTests
     public async Task GetApplicationNotesAsync_WithInvalidApplicationId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _applicationNoteService.GetApplicationNotesAsync(0));
     }
 }

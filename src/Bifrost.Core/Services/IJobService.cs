@@ -11,7 +11,7 @@ public interface IJobService
     /// <summary>
     /// Creates a new job.
     /// </summary>
-    Task<Job> CreateJobAsync(Guid userId, string title, string company, string location, 
+    Task<Job> CreateJobAsync(Guid userId, string title, string company, string location,
         int jobType, string description, bool offerSponsorship, bool offerRelocation);
 
     /// <summary>

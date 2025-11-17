@@ -44,7 +44,7 @@ public class PreferencesServiceTests
     public async Task CreatePreferencesAsync_WithEmptyUserId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _preferencesService.CreatePreferencesAsync(Guid.Empty, 50000, 100000, "", ""));
     }
 
@@ -52,7 +52,7 @@ public class PreferencesServiceTests
     public async Task CreatePreferencesAsync_WithNegativeMinSalary_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), -1000, 100000, "", ""));
     }
 
@@ -60,7 +60,7 @@ public class PreferencesServiceTests
     public async Task CreatePreferencesAsync_WithNegativeMaxSalary_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), 50000, -100, "", ""));
     }
 
@@ -68,7 +68,7 @@ public class PreferencesServiceTests
     public async Task CreatePreferencesAsync_WithMinSalaryGreaterThanMax_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), 100000, 50000, "", ""));
     }
 
@@ -76,9 +76,9 @@ public class PreferencesServiceTests
     public async Task UpdatePreferencesAsync_WithValidData_UpdatesPreferencesSuccessfully()
     {
         // Arrange
-        var preferences = new Preferences 
-        { 
-            Id = 1, 
+        var preferences = new Preferences
+        {
+            Id = 1,
             SalaryRange = new SalaryRange { Min = 50000m, Max = 100000m }
         };
         _preferencesRepositoryMock.GetById(1).Returns(preferences);
@@ -96,7 +96,7 @@ public class PreferencesServiceTests
     public async Task UpdatePreferencesAsync_WithInvalidPreferenceId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _preferencesService.UpdatePreferencesAsync(0, 50000, 100000, "", ""));
     }
 
@@ -108,7 +108,7 @@ public class PreferencesServiceTests
         _preferencesRepositoryMock.GetById(1).Returns(preferences);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _preferencesService.UpdatePreferencesAsync(1, 100000, 50000, "", ""));
     }
 
@@ -119,7 +119,7 @@ public class PreferencesServiceTests
         _preferencesRepositoryMock.GetById(999).Returns((Preferences?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _preferencesService.UpdatePreferencesAsync(999, 50000, 100000, "", ""));
     }
 
@@ -141,7 +141,7 @@ public class PreferencesServiceTests
     public async Task DeletePreferencesAsync_WithInvalidPreferenceId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _preferencesService.DeletePreferencesAsync(0));
     }
 
@@ -152,7 +152,7 @@ public class PreferencesServiceTests
         _preferencesRepositoryMock.GetById(999).Returns((Preferences?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _preferencesService.DeletePreferencesAsync(999));
     }
 
@@ -161,9 +161,9 @@ public class PreferencesServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var preferences = new Preferences 
-        { 
-            Id = 1, 
+        var preferences = new Preferences
+        {
+            Id = 1,
             SupabaseUserId = userId,
             SalaryRange = new SalaryRange { Min = 50000m, Max = 100000m }
         };
@@ -182,7 +182,7 @@ public class PreferencesServiceTests
     public async Task GetUserPreferencesAsync_WithEmptyUserId_ThrowsArgumentException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _preferencesService.GetUserPreferencesAsync(Guid.Empty));
     }
 

@@ -11,13 +11,13 @@ public interface IPreferencesService
     /// <summary>
     /// Creates user preferences.
     /// </summary>
-    Task<Preferences> CreatePreferencesAsync(Guid userId, decimal minSalary, 
+    Task<Preferences> CreatePreferencesAsync(Guid userId, decimal minSalary,
         decimal maxSalary, string preferredJobTypes, string preferredLocations);
 
     /// <summary>
     /// Updates user preferences.
     /// </summary>
-    Task<Preferences> UpdatePreferencesAsync(long preferenceId, decimal minSalary, 
+    Task<Preferences> UpdatePreferencesAsync(long preferenceId, decimal minSalary,
         decimal maxSalary, string preferredJobTypes, string preferredLocations);
 
     /// <summary>
