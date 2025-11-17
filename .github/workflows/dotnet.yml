@@ -23,3 +23,28 @@ jobs:
       run: dotnet build --no-restore Bifrost.sln
     - name: Test
       run: dotnet test --no-build --verbosity normal Bifrost.sln
+    - name: Collect Code Coverage
+      run: |
+        dotnet test Bifrost.sln \
+          --no-build \
+          --verbosity normal \
+          /p:CollectCoverage=true \
+          /p:CoverletOutputFormat=opencover \
+          /p:CoverletOutput=./coverage/
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
+    - name: Generate Coverage Report
+      run: |
+        reportgenerator \
+          -reports:"test/**/coverage.opencover.xml" \
+          -targetdir:"coverage/report" \
+          -reporttypes:"Html;Badges"
+    - name: Upload Coverage Results to GitHub
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-results
+        path: |
+          coverage/
+          test/**/coverage.opencover.xml
+        retention-days: 30
