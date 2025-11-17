@@ -1,0 +1,7 @@
+﻿services:
+  bifrost.api:
+    image: bifrost.api
+    build:
+      context: .
+      dockerfile: src/Bifrost.Api/Dockerfile
+

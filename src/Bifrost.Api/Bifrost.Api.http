@@ -1,0 +1,6 @@
+@Bifrost.Api_HostAddress = http://localhost:5037
+
+GET {{Bifrost.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
