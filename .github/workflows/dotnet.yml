@@ -33,8 +33,7 @@ jobs:
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=opencover \
           /p:CoverletOutput="${{ github.workspace }}/coverage/" \
-          /p:CoverletOutputFileName="coverage.opencover.xml" \
-          /p:Exclude="[xunit.*]*,[*.Tests]*"
+          /p:CoverletOutputFileName="coverage.opencover.xml"
     - name: Debug - Check for coverage files
       run: |
         echo "=== Checking for coverage files ==="
