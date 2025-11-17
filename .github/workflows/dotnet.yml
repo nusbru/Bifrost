@@ -30,13 +30,15 @@ jobs:
           --verbosity normal \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput=./coverage/
+          /p:CoverletOutput=./coverage/ \
+          /p:MergeWith=./coverage/coverage.json \
+          /p:CoverletOutputFormatVersion=0.9
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Generate Coverage Report
       run: |
         reportgenerator \
-          -reports:"coverage/coverage.opencover.xml" \
+          -reports:"coverage/*.opencover.xml" \
           -targetdir:"coverage/report" \
           -reporttypes:"Html;Badges"
     - name: Upload Coverage Results to GitHub
