@@ -36,18 +36,29 @@ jobs:
           /p:CoverletOutputFileName="coverage.opencover.xml"
     - name: Debug - Check for coverage files
       run: |
-        echo "=== Checking for coverage files ==="
-        find ${{ github.workspace }}/coverage -type f
+        echo "=== Checking entire workspace for coverage files ==="
+        find ${{ github.workspace }} -name "*.opencover.xml" -o -name "coverage.*" 2>/dev/null | head -30
         echo "=== Listing coverage directory ==="
-        ls -lah ${{ github.workspace }}/coverage/
+        ls -lah ${{ github.workspace }}/coverage/ 2>/dev/null || echo "coverage directory empty or not found"
+        echo "=== Listing test directories ==="
+        find ${{ github.workspace }}/test -name "coverage" -type d 2>/dev/null
+        echo "=== Checking for any coverage-related files ==="
+        find ${{ github.workspace }}/test -type f -name "*coverage*" 2>/dev/null | head -20
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Generate Coverage Report
+      if: hashFiles(format('{0}/coverage/coverage.opencover.xml', github.workspace)) != ''
       run: |
         reportgenerator \
           -reports:"${{ github.workspace }}/coverage/coverage.opencover.xml" \
           -targetdir:"${{ github.workspace }}/coverage/report" \
           -reporttypes:"Html;Badges"
+    - name: Coverage Report Not Found
+      if: hashFiles(format('{0}/coverage/coverage.opencover.xml', github.workspace)) == ''
+      run: |
+        echo "WARNING: Coverage file not found at expected location"
+        echo "Checking for coverage files in test directories..."
+        find ${{ github.workspace }}/test -name "*.opencover.xml" -exec echo "Found: {}" \;
     - name: Upload Coverage Results to GitHub
       uses: actions/upload-artifact@v4
       if: always()
