@@ -23,45 +23,29 @@ jobs:
       run: dotnet build --no-restore Bifrost.sln
     - name: Test
       run: dotnet test --no-build --verbosity normal Bifrost.sln
-    - name: Collect Code Coverage - Core
+    - name: Create coverage directory
+      run: mkdir -p ${{ github.workspace }}/coverage
+    - name: Collect Code Coverage
       run: |
-        dotnet test test/Bifrost.Core.Tests/Bifrost.Core.Tests.csproj \
+        dotnet test Bifrost.sln \
           --no-build \
           --verbosity normal \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput=${{ github.workspace }}/coverage/ \
-          /p:CoverletOutputFileName=core-coverage.opencover.xml
-    - name: Collect Code Coverage - Infrastructure
+          /p:CoverletOutput="${{ github.workspace }}/coverage/coverage.opencover.xml" \
+          /p:Exclude="[xunit.*]*,[*.Tests]*"
+    - name: Debug - Check for coverage files
       run: |
-        dotnet test test/Bifrost.Infrastructure.Tests/Bifrost.Infrastructure.Tests.csproj \
-          --no-build \
-          --verbosity normal \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput=${{ github.workspace }}/coverage/ \
-          /p:CoverletOutputFileName=infra-coverage.opencover.xml
-    - name: Collect Code Coverage - API
-      run: |
-        dotnet test test/Bifrost.Api.Tests/Bifrost.Api.Tests.csproj \
-          --no-build \
-          --verbosity normal \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput=${{ github.workspace }}/coverage/ \
-          /p:CoverletOutputFileName=api-coverage.opencover.xml
-    - name: Debug - List coverage files
-      run: |
-        echo "Files in coverage directory:"
-        find ${{ github.workspace }}/coverage -type f || echo "No files found"
-        echo "---"
-        ls -la ${{ github.workspace }}/coverage/ || echo "coverage directory not found"
+        echo "=== Checking for coverage files ==="
+        find ${{ github.workspace }}/coverage -type f
+        echo "=== Listing coverage directory ==="
+        ls -lah ${{ github.workspace }}/coverage/
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Generate Coverage Report
       run: |
         reportgenerator \
-          -reports:"${{ github.workspace }}/coverage/*.opencover.xml" \
+          -reports:"${{ github.workspace }}/coverage/coverage.opencover.xml" \
           -targetdir:"${{ github.workspace }}/coverage/report" \
           -reporttypes:"Html;Badges"
     - name: Upload Coverage Results to GitHub
