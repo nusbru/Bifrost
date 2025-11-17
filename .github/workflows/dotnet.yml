@@ -23,22 +23,36 @@ jobs:
       run: dotnet build --no-restore Bifrost.sln
     - name: Test
       run: dotnet test --no-build --verbosity normal Bifrost.sln
-    - name: Collect Code Coverage
+    - name: Collect Code Coverage - Core
       run: |
-        dotnet test Bifrost.sln \
+        dotnet test test/Bifrost.Core.Tests/Bifrost.Core.Tests.csproj \
           --no-build \
           --verbosity normal \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput=./coverage/ \
-          /p:MergeWith=./coverage/coverage.json \
-          /p:CoverletOutputFormatVersion=0.9
+          /p:CoverletOutput=../../coverage/core-
+    - name: Collect Code Coverage - Infrastructure
+      run: |
+        dotnet test test/Bifrost.Infrastructure.Tests/Bifrost.Infrastructure.Tests.csproj \
+          --no-build \
+          --verbosity normal \
+          /p:CollectCoverage=true \
+          /p:CoverletOutputFormat=opencover \
+          /p:CoverletOutput=../../coverage/infra-
+    - name: Collect Code Coverage - API
+      run: |
+        dotnet test test/Bifrost.Api.Tests/Bifrost.Api.Tests.csproj \
+          --no-build \
+          --verbosity normal \
+          /p:CollectCoverage=true \
+          /p:CoverletOutputFormat=opencover \
+          /p:CoverletOutput=../../coverage/api-
     - name: Debug - List coverage files
       run: |
         echo "Files in coverage directory:"
         find coverage -type f || echo "No files found"
-        echo "Current directory contents:"
-        ls -la
+        echo "---"
+        ls -la coverage/ || echo "coverage directory not found"
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Generate Coverage Report
