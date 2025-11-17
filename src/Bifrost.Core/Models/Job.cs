@@ -12,6 +12,6 @@ public class Job : Entity
     public string Description { get; set; } = string.Empty;
     public bool OfferSponsorship { get; set; } = true;
     public bool OfferRelocation {get; set;} = true;
-    
-    public virtual JobApplication JobApplication { get; set; }
+
+    public virtual JobApplication? JobApplication { get; set; }
 }
