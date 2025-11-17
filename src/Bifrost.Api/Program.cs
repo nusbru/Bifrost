@@ -1,3 +1,7 @@
+using Bifrost.Api.Endpoints;
+using Bifrost.Core.Services;
+using Bifrost.Infrastructure;
+
 namespace Bifrost.Api;
 
 public class Program
@@ -12,6 +16,15 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
+        // Register Infrastructure Services and DbContext
+        builder.Services.AddInfrastructure(builder.Configuration);
+
+        // Register Core Services
+        builder.Services.AddScoped<IJobService, JobService>();
+        builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
+        builder.Services.AddScoped<IApplicationNoteService, ApplicationNoteService>();
+        builder.Services.AddScoped<IPreferencesService, PreferencesService>();
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -24,24 +37,11 @@ public class Program
 
         app.UseAuthorization();
 
-        var summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
-        app.MapGet("/weatherforecast", (HttpContext httpContext) =>
-            {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                        new WeatherForecast
-                        {
-                            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                            TemperatureC = Random.Shared.Next(-20, 55),
-                            Summary = summaries[Random.Shared.Next(summaries.Length)]
-                        })
-                    .ToArray();
-                return forecast;
-            })
-            .WithName("GetWeatherForecast");
+        // Map API endpoints
+        app.MapJobEndpoints();
+        app.MapJobApplicationEndpoints();
+        app.MapApplicationNoteEndpoints();
+        app.MapPreferencesEndpoints();
 
         app.Run();
     }

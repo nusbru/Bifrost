@@ -12,6 +12,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Bifrost.Core\Bifrost.Core.csproj"/>
+        <ProjectReference Include="..\Bifrost.Infrastructure\Bifrost.Infrastructure.csproj"/>
+        <ProjectReference Include="..\Bifrost.Contracts\Bifrost.Contracts.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
       <Content Include="..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
