@@ -32,7 +32,8 @@ jobs:
           --verbosity normal \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput="${{ github.workspace }}/coverage/coverage.opencover.xml" \
+          /p:CoverletOutput="${{ github.workspace }}/coverage/" \
+          /p:CoverletOutputFileName="coverage.opencover.xml" \
           /p:Exclude="[xunit.*]*,[*.Tests]*"
     - name: Debug - Check for coverage files
       run: |
