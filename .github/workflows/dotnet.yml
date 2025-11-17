@@ -30,10 +30,12 @@ jobs:
         dotnet test Bifrost.sln \
           --no-build \
           --verbosity normal \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput="${{ github.workspace }}/coverage/" \
-          /p:CoverletOutputFileName="coverage.opencover.xml"
+          --settings coverlet.runsettings \
+          --collect:"XPlat Code Coverage"
+    - name: Copy coverage files
+      run: |
+        mkdir -p ${{ github.workspace }}/coverage
+        find ${{ github.workspace }}/test -name "coverage.opencover.xml" -exec cp {} ${{ github.workspace }}/coverage/ \;
     - name: Debug - Check for coverage files
       run: |
         echo "=== Checking entire workspace for coverage files ==="
@@ -47,16 +49,16 @@ jobs:
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Generate Coverage Report
-      if: hashFiles(format('{0}/coverage/coverage.opencover.xml', github.workspace)) != ''
+      if: hashFiles(format('{0}/coverage/*.opencover.xml', github.workspace)) != ''
       run: |
         reportgenerator \
-          -reports:"${{ github.workspace }}/coverage/coverage.opencover.xml" \
+          -reports:"${{ github.workspace }}/coverage/*.opencover.xml" \
           -targetdir:"${{ github.workspace }}/coverage/report" \
           -reporttypes:"Html;Badges"
     - name: Coverage Report Not Found
-      if: hashFiles(format('{0}/coverage/coverage.opencover.xml', github.workspace)) == ''
+      if: hashFiles(format('{0}/coverage/*.opencover.xml', github.workspace)) == ''
       run: |
-        echo "WARNING: Coverage file not found at expected location"
+        echo "WARNING: Coverage files not found at expected location"
         echo "Checking for coverage files in test directories..."
         find ${{ github.workspace }}/test -name "*.opencover.xml" -exec echo "Found: {}" \;
     - name: Upload Coverage Results to GitHub
