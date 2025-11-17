@@ -36,7 +36,7 @@ jobs:
     - name: Generate Coverage Report
       run: |
         reportgenerator \
-          -reports:"test/**/coverage.opencover.xml" \
+          -reports:"coverage/coverage.opencover.xml" \
           -targetdir:"coverage/report" \
           -reporttypes:"Html;Badges"
     - name: Upload Coverage Results to GitHub
