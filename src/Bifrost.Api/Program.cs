@@ -1,6 +1,7 @@
 using Bifrost.Api.Endpoints;
 using Bifrost.Core.Services;
 using Bifrost.Infrastructure;
+using Scalar.AspNetCore;
 
 namespace Bifrost.Api;
 
@@ -31,6 +32,9 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
+            app.MapScalarApiReference(options => options
+                .WithTitle("Bifrost - Job Application Tracker API")
+                .WithTheme(ScalarTheme.BluePlanet));
         }
 
         app.UseHttpsRedirection();
