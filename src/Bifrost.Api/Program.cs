@@ -28,24 +28,29 @@ public class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
-            app.MapScalarApiReference(options => options
-                .WithTitle("Bifrost - Job Application Tracker API")
-                .WithTheme(ScalarTheme.BluePlanet));
+            app.MapScalarApiReference("/docs", options =>
+            {
+                options.WithTitle("Bifrost API - Job Application Tracker")
+                    .WithTheme(ScalarTheme.Purple)
+                    .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+            });
         }
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
 
         // Map API endpoints
         app.MapJobEndpoints();
         app.MapJobApplicationEndpoints();
         app.MapApplicationNoteEndpoints();
         app.MapPreferencesEndpoints();
+
+
+        /// Configure the HTTP request pipeline.
+        app.UseHttpsRedirection();
+        app.UseAuthorization();
+
 
         app.Run();
     }
