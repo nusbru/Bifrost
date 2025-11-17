@@ -1,7 +1,29 @@
 ﻿services:
-  bifrost.api:
-    image: bifrost.api
-    build:
-      context: .
-      dockerfile: src/Bifrost.Api/Dockerfile
+  postgres:
+    image: postgres:16-alpine
+    container_name: bifrost-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: BifrostDB
+      POSTGRES_USER: bifrost_user
+      POSTGRES_PASSWORD: bifrost_pass
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bifrost_user -d BifrostDB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bifrost-network
 
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  bifrost-network:
+    driver: bridge
