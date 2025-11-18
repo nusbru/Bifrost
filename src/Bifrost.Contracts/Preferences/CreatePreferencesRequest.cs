@@ -7,5 +7,16 @@ public record CreatePreferencesRequest(
     Guid UserId,
     decimal MinSalary,
     decimal MaxSalary,
-    string PreferredJobTypes,
-    string PreferredLocations);
+    JobType PreferredJobType,
+    bool NeedSponsorship,
+    bool NeedRelocation);
+
+
+public enum JobType
+{
+    None,
+    FullTime,
+    PartTime,
+    Contract,
+    Remote
+}

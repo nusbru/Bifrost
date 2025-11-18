@@ -1,3 +1,4 @@
+using Bifrost.Core.Enums;
 using Bifrost.Core.Models;
 using Bifrost.Core.Repositories;
 
@@ -6,17 +7,12 @@ namespace Bifrost.Core.Services;
 /// <summary>
 /// Service for managing Preferences operations.
 /// </summary>
-public class PreferencesService : IPreferencesService
+public class PreferencesService(IPreferencesRepository preferencesRepository) : IPreferencesService
 {
-    private readonly IPreferencesRepository _preferencesRepository;
-
-    public PreferencesService(IPreferencesRepository preferencesRepository)
-    {
-        _preferencesRepository = preferencesRepository ?? throw new ArgumentNullException(nameof(preferencesRepository));
-    }
+    private readonly IPreferencesRepository _preferencesRepository = preferencesRepository ?? throw new ArgumentNullException(nameof(preferencesRepository));
 
     public async Task<Preferences> CreatePreferencesAsync(Guid userId, decimal minSalary,
-        decimal maxSalary, string preferredJobTypes, string preferredLocations)
+        decimal maxSalary, int preferredJobType, bool needSponsorship, bool needRelocation)
     {
         ValidateUserId(userId);
         ValidateSalaryRange(minSalary, maxSalary);
@@ -24,7 +20,10 @@ public class PreferencesService : IPreferencesService
         var preferences = new Preferences
         {
             SalaryRange = new SalaryRange { Min = minSalary, Max = maxSalary },
-            SupabaseUserId = userId
+            SupabaseUserId = userId,
+            JobType = (JobType)preferredJobType,
+            NeedRelocation = needRelocation,
+            NeedSponsorship = needSponsorship,
         };
 
         await _preferencesRepository.Add(preferences);

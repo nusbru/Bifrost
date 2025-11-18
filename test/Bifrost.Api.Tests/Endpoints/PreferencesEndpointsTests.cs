@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using JobType = Bifrost.Contracts.Preferences.JobType;
 
 namespace Bifrost.Api.Tests.Endpoints;
 
@@ -31,24 +32,27 @@ public class PreferencesEndpointsTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var request = new CreatePreferencesRequest(userId, 50000m, 100000m, "FullTime", "US");
+        var request = new CreatePreferencesRequest(userId, 50000m, 100000m,
+            JobType.FullTime, false, false);
 
         var preferences = new Preferences
         {
             Id = 1,
             SupabaseUserId = userId,
-            JobType = JobType.FullTime,
+            JobType = Core.Enums.JobType.FullTime,
             SalaryRange = new SalaryRange { Min = 50000, Max = 100000 },
             NeedSponsorship = false
         };
 
-        _preferencesServiceMock.CreatePreferencesAsync(userId, 50000m, 100000m, "FullTime", "US")
+        _preferencesServiceMock.CreatePreferencesAsync(userId, 50000m, 100000m,
+            (int)Core.Enums.JobType.FullTime, false, false)
             .Returns(preferences);
 
         // Act
         var response = await _app.Services
             .GetRequiredService<IPreferencesService>()
-            .CreatePreferencesAsync(userId, 50000m, 100000m, "FullTime", "US");
+            .CreatePreferencesAsync(userId, 50000m, 100000m,
+                (int)Core.Enums.JobType.FullTime, false, false);
 
         // Assert
         response.Should().NotBeNull();
@@ -63,14 +67,16 @@ public class PreferencesEndpointsTests
         var userId = Guid.NewGuid();
 
         _preferencesServiceMock
-            .CreatePreferencesAsync(userId, 100000m, 50000m, "FullTime", "US")
+            .CreatePreferencesAsync(userId, 100000m, 50000m,
+                (int)Core.Enums.JobType.FullTime, false, false)
             .Returns(Task.FromException<Preferences>(new ArgumentException("Min salary must be less than or equal to max salary")));
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
             _app.Services
                 .GetRequiredService<IPreferencesService>()
-                .CreatePreferencesAsync(userId, 100000m, 50000m, "FullTime", "US"));
+                .CreatePreferencesAsync(userId, 100000m, 50000m,
+                    (int)Core.Enums.JobType.FullTime, false, false));
     }
 
     [Fact]
@@ -78,14 +84,16 @@ public class PreferencesEndpointsTests
     {
         // Arrange
         _preferencesServiceMock
-            .CreatePreferencesAsync(Guid.Empty, 50000m, 100000m, "FullTime", "US")
+            .CreatePreferencesAsync(Guid.Empty, 50000m, 100000m,
+                (int)Core.Enums.JobType.FullTime, false, false)
             .Returns(Task.FromException<Preferences>(new ArgumentException("User ID cannot be empty")));
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
             _app.Services
                 .GetRequiredService<IPreferencesService>()
-                .CreatePreferencesAsync(Guid.Empty, 50000m, 100000m, "FullTime", "US"));
+                .CreatePreferencesAsync(Guid.Empty, 50000m, 100000m,
+                    (int)Core.Enums.JobType.FullTime, false, false));
     }
 
     [Fact]
@@ -97,7 +105,7 @@ public class PreferencesEndpointsTests
         {
             Id = 1,
             SupabaseUserId = userId,
-            JobType = JobType.FullTime,
+            JobType = Core.Enums.JobType.FullTime,
             SalaryRange = new SalaryRange { Min = 50000, Max = 100000 },
             NeedSponsorship = false
         };
@@ -144,7 +152,7 @@ public class PreferencesEndpointsTests
         {
             Id = preferencesId,
             SupabaseUserId = Guid.NewGuid(),
-            JobType = JobType.FullTime,
+            JobType = Core.Enums.JobType.FullTime,
             SalaryRange = new SalaryRange { Min = 60000, Max = 120000 },
             NeedSponsorship = false
         };

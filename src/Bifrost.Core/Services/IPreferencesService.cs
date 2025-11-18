@@ -1,3 +1,4 @@
+using Bifrost.Core.Enums;
 using Bifrost.Core.Models;
 
 namespace Bifrost.Core.Services;
@@ -12,7 +13,7 @@ public interface IPreferencesService
     /// Creates user preferences.
     /// </summary>
     Task<Preferences> CreatePreferencesAsync(Guid userId, decimal minSalary,
-        decimal maxSalary, string preferredJobTypes, string preferredLocations);
+        decimal maxSalary, int preferredJobType, bool needSponsorship, bool needRelocation);
 
     /// <summary>
     /// Updates user preferences.
@@ -30,3 +31,4 @@ public interface IPreferencesService
     /// </summary>
     Task<Preferences?> GetUserPreferencesAsync(Guid userId);
 }
+

@@ -51,8 +51,9 @@ public static class PreferencesEndpoints
                 request.UserId,
                 request.MinSalary,
                 request.MaxSalary,
-                request.PreferredJobTypes,
-                request.PreferredLocations);
+                (int)request.PreferredJobType,
+                request.NeedSponsorship,
+                request.NeedRelocation);
 
             var response = new PreferencesResponse(
                 preferences.Id,

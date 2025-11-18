@@ -24,12 +24,13 @@ public class PreferencesServiceTests
         var userId = Guid.NewGuid();
         var minSalary = 50000m;
         var maxSalary = 100000m;
-        var jobTypes = "FullTime,PartTime";
-        var locations = "New York,Remote";
+        var preferredJobType = 1; // FullTime
+        var needSponsorship = false;
+        var needRelocation = false;
 
         // Act
         var result = await _preferencesService.CreatePreferencesAsync(
-            userId, minSalary, maxSalary, jobTypes, locations);
+            userId, minSalary, maxSalary, preferredJobType, needSponsorship, needRelocation);
 
         // Assert
         result.Should().NotBeNull();
@@ -45,7 +46,7 @@ public class PreferencesServiceTests
     {
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _preferencesService.CreatePreferencesAsync(Guid.Empty, 50000, 100000, "", ""));
+            _preferencesService.CreatePreferencesAsync(Guid.Empty, 50000, 100000, 1, false, false));
     }
 
     [Fact]
@@ -53,7 +54,7 @@ public class PreferencesServiceTests
     {
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), -1000, 100000, "", ""));
+            _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), -1000, 100000, 1, false, false));
     }
 
     [Fact]
@@ -61,7 +62,7 @@ public class PreferencesServiceTests
     {
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), 50000, -100, "", ""));
+            _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), 50000, -100, 1, false, false));
     }
 
     [Fact]
@@ -69,7 +70,7 @@ public class PreferencesServiceTests
     {
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), 100000, 50000, "", ""));
+            _preferencesService.CreatePreferencesAsync(Guid.NewGuid(), 100000, 50000, 1, false, false));
     }
 
     [Fact]

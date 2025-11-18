@@ -46,11 +46,9 @@ public class Program
         app.MapApplicationNoteEndpoints();
         app.MapPreferencesEndpoints();
 
-
         /// Configure the HTTP request pipeline.
         app.UseHttpsRedirection();
         app.UseAuthorization();
-
 
         app.Run();
     }

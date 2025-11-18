@@ -1,0 +1,4 @@
+{
+    "entityframework.project": "src/Bifrost.Infrastructure",
+    "entityframework.startupProject": "src/Bifrost.Api"
+}
