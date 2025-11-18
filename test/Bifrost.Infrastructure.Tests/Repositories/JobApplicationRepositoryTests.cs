@@ -25,7 +25,6 @@ public class JobApplicationRepositoryTests : IClassFixture<BifrostDbContextFixtu
 
         // Act
         await repository.Add(jobApplication);
-        await context.SaveChangesAsync();
 
         // Assert
         var result = await repository.GetById(jobApplication.Id);
@@ -52,7 +51,6 @@ public class JobApplicationRepositoryTests : IClassFixture<BifrostDbContextFixtu
             new JobApplication { JobId = job2.Id, Status = JobApplicationStatus.InProcess, SupabaseUserId = userId, Created = DateTime.UtcNow, Updated = DateTime.UtcNow }
         };
         await repository.AddRange(jobApplications);
-        await context.SaveChangesAsync();
 
         // Act
         var result = await repository.GetAll();
@@ -80,7 +78,6 @@ public class JobApplicationRepositoryTests : IClassFixture<BifrostDbContextFixtu
             new JobApplication { JobId = job2.Id, Status = JobApplicationStatus.InProcess, SupabaseUserId = userId, Created = DateTime.UtcNow, Updated = DateTime.UtcNow }
         };
         await repository.AddRange(jobApplications);
-        await context.SaveChangesAsync();
 
         // Act
         var result = await repository.Find(ja => ja.Status == JobApplicationStatus.Applied);
@@ -99,11 +96,9 @@ public class JobApplicationRepositoryTests : IClassFixture<BifrostDbContextFixtu
         var job = new Job { Title = "Software Engineer", Company = "Google", SupabaseUserId = Guid.NewGuid() };
         var jobApplication = new JobApplication { Job = job, Status = JobApplicationStatus.Applied, SupabaseUserId = job.SupabaseUserId, Created = DateTime.UtcNow, Updated = DateTime.UtcNow };
         await repository.Add(jobApplication);
-        await context.SaveChangesAsync();
 
         // Act
-        repository.Remove(jobApplication);
-        await context.SaveChangesAsync();
+        await repository.Remove(jobApplication);
 
         // Assert
         var result = await repository.GetById(jobApplication.Id);
@@ -126,12 +121,10 @@ public class JobApplicationRepositoryTests : IClassFixture<BifrostDbContextFixtu
             new JobApplication { JobId = job.Id, Status = JobApplicationStatus.InProcess, SupabaseUserId = job.SupabaseUserId, Created = DateTime.UtcNow, Updated = DateTime.UtcNow }
         };
         await repository.AddRange(jobApplications);
-        await context.SaveChangesAsync();
 
         // Act
         var applicationsToRemove = await repository.GetAll();
-        repository.RemoveRange(applicationsToRemove);
-        await context.SaveChangesAsync();
+        await repository.RemoveRange(applicationsToRemove);
 
         // Assert
         var result = await repository.GetAll();

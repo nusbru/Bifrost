@@ -221,7 +221,7 @@ public class JobEndpointsTests
     {
         // Arrange
         var jobId = 1L;
-        var request = new UpdateJobRequest("Senior Developer", "Google", "New York", "Updated description");
+        var request = new UpdateJobRequest("Senior Developer", "Google", "New York", "Updated description", true, false);
         var job = new Job
         {
             Id = jobId,
@@ -234,13 +234,13 @@ public class JobEndpointsTests
             UpdatedAt = DateTime.UtcNow
         };
 
-        _jobServiceMock.UpdateJobAsync(jobId, request.Title, request.Company, request.Location, request.Description)
+        _jobServiceMock.UpdateJobAsync(jobId, request.Title, request.Company, request.Location, request.Description, request.OfferSponsorship, request.OfferRelocation)
             .Returns(job);
 
         // Act
         var response = await _app.Services
             .GetRequiredService<IJobService>()
-            .UpdateJobAsync(jobId, request.Title!, request.Company!, request.Location!, request.Description!);
+            .UpdateJobAsync(jobId, request.Title!, request.Company!, request.Location!, request.Description!, request.OfferSponsorship, request.OfferRelocation);
 
         // Assert
         response.Should().NotBeNull();
@@ -252,16 +252,16 @@ public class JobEndpointsTests
     public async Task UpdateJob_WithNonExistentId_ThrowsInvalidOperationException()
     {
         // Arrange
-        var request = new UpdateJobRequest("Senior Developer", "Google", "New York", "Updated");
+        var request = new UpdateJobRequest("Senior Developer", "Google", "New York", "Updated", true, false);
 
-        _jobServiceMock.UpdateJobAsync(999, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+        _jobServiceMock.UpdateJobAsync(999, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool?>(), Arg.Any<bool?>())
             .Returns(Task.FromException<Job>(new InvalidOperationException("Job not found")));
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _app.Services
                 .GetRequiredService<IJobService>()
-                .UpdateJobAsync(999, request.Title!, request.Company!, request.Location!, request.Description!));
+                .UpdateJobAsync(999, request.Title!, request.Company!, request.Location!, request.Description!, request.OfferSponsorship, request.OfferRelocation));
     }
 
     [Fact]

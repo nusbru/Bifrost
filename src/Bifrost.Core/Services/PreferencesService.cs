@@ -31,7 +31,7 @@ public class PreferencesService(IPreferencesRepository preferencesRepository) : 
     }
 
     public async Task<Preferences> UpdatePreferencesAsync(long preferenceId, decimal minSalary,
-        decimal maxSalary, string preferredJobTypes, string preferredLocations)
+        decimal maxSalary, int? jobType = null, bool? needSponsorship = false, bool? needRelocation = false)
     {
         ValidatePreferenceId(preferenceId);
         ValidateSalaryRange(minSalary, maxSalary);
@@ -41,6 +41,16 @@ public class PreferencesService(IPreferencesRepository preferencesRepository) : 
 
         preferences.SalaryRange = new SalaryRange { Min = minSalary, Max = maxSalary };
 
+        if (jobType.HasValue)
+            preferences.JobType = (JobType)jobType.Value;
+
+        if (needSponsorship.HasValue)
+            preferences.NeedSponsorship = needSponsorship.Value;
+
+        if (needRelocation.HasValue)
+            preferences.NeedRelocation = needRelocation.Value;
+
+        await _preferencesRepository.Update(preferences);
         return preferences;
     }
 
@@ -51,7 +61,7 @@ public class PreferencesService(IPreferencesRepository preferencesRepository) : 
         var preferences = await _preferencesRepository.GetById(preferenceId)
             ?? throw new InvalidOperationException($"Preferences with ID {preferenceId} not found.");
 
-        _preferencesRepository.Remove(preferences);
+        await _preferencesRepository.Remove(preferences);
     }
 
     public async Task<Preferences?> GetUserPreferencesAsync(Guid userId)

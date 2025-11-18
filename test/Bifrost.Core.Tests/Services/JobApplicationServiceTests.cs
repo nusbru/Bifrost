@@ -87,6 +87,7 @@ public class JobApplicationServiceTests
         // Assert
         result.Status.Should().Be(JobApplicationStatus.InProcess);
         result.Updated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        await _applicationRepositoryMock.Received(1).Update(result);
     }
 
     [Fact]
@@ -119,7 +120,7 @@ public class JobApplicationServiceTests
         await _jobApplicationService.DeleteApplicationAsync(1);
 
         // Assert
-        _applicationRepositoryMock.Received(1).Remove(application);
+        await _applicationRepositoryMock.Received(1).Remove(application);
     }
 
     [Fact]

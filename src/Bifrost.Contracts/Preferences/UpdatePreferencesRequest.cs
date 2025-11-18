@@ -6,5 +6,6 @@ namespace Bifrost.Contracts.Preferences;
 public record UpdatePreferencesRequest(
     decimal MinSalary,
     decimal MaxSalary,
-    string PreferredJobTypes,
-    string PreferredLocations);
+    int? JobType,
+    bool? NeedSponsorship,
+    bool? NeedRelocation);

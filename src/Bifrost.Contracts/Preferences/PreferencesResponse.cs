@@ -8,7 +8,8 @@ public record PreferencesResponse(
     Guid UserId,
     decimal MinSalary,
     decimal MaxSalary,
-    string PreferredJobTypes,
-    string PreferredLocations,
+    int JobType,
+    bool NeedSponsorship,
+    bool NeedRelocation,
     DateTime CreatedAt,
     DateTime? UpdatedAt);

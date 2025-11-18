@@ -19,7 +19,7 @@ public interface IPreferencesService
     /// Updates user preferences.
     /// </summary>
     Task<Preferences> UpdatePreferencesAsync(long preferenceId, decimal minSalary,
-        decimal maxSalary, string preferredJobTypes, string preferredLocations);
+        decimal maxSalary, int? jobType = 0, bool? needSponsorship = false, bool? needRelocation = false);
 
     /// <summary>
     /// Deletes user preferences.

@@ -39,7 +39,7 @@ public class JobService : IJobService
         return job;
     }
 
-    public async Task<Job> UpdateJobAsync(long jobId, string title, string company, string location, string description)
+    public async Task<Job> UpdateJobAsync(long jobId, string? title, string? company, string? location, string? description, bool? offerSponsorship = null, bool? offerRelocation = null)
     {
         ValidateJobId(jobId);
 
@@ -58,6 +58,13 @@ public class JobService : IJobService
         if (description != null)
             job.Description = description.Trim();
 
+        if (offerSponsorship.HasValue)
+            job.OfferSponsorship = offerSponsorship.Value;
+
+        if (offerRelocation.HasValue)
+            job.OfferRelocation = offerRelocation.Value;
+
+        await _jobRepository.Update(job);
         return job;
     }
 
@@ -68,7 +75,7 @@ public class JobService : IJobService
         var job = await _jobRepository.GetById(jobId)
             ?? throw new InvalidOperationException($"Job with ID {jobId} not found.");
 
-        _jobRepository.Remove(job);
+        await _jobRepository.Remove(job);
     }
 
     public async Task<Job?> GetJobByIdAsync(long jobId)

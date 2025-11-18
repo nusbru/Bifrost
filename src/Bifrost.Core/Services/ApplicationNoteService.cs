@@ -46,6 +46,7 @@ public class ApplicationNoteService : IApplicationNoteService
             ?? throw new InvalidOperationException($"Application note with ID {noteId} not found.");
 
         note.Note = noteText.Trim();
+        await _noteRepository.Update(note);
         return note;
     }
 
@@ -56,7 +57,7 @@ public class ApplicationNoteService : IApplicationNoteService
         var note = await _noteRepository.GetById(noteId)
             ?? throw new InvalidOperationException($"Application note with ID {noteId} not found.");
 
-        _noteRepository.Remove(note);
+        await _noteRepository.Remove(note);
     }
 
     public async Task<ApplicationNote?> GetNoteByIdAsync(long noteId)

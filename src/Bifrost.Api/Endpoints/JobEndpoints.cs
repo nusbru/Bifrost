@@ -178,7 +178,9 @@ public static class JobEndpoints
                 request.Title,
                 request.Company,
                 request.Location,
-                request.Description);
+                request.Description,
+                request.OfferSponsorship,
+                request.OfferRelocation);
 
             var response = new JobResponse(
                 job.Id,

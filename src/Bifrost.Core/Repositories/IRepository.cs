@@ -10,6 +10,7 @@ public interface IRepository<T> where T : Entity
     Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate);
     Task Add(T entity);
     Task AddRange(IEnumerable<T> entities);
-    void Remove(T entity);
-    void RemoveRange(IEnumerable<T> entities);
+    Task Update(T entity);
+    Task Remove(T entity);
+    Task RemoveRange(IEnumerable<T> entities);
 }

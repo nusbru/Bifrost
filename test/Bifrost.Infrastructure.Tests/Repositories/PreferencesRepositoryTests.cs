@@ -33,7 +33,6 @@ public class PreferencesRepositoryTests : IClassFixture<BifrostDbContextFixture>
 
         // Act
         await repository.Add(preferences);
-        await context.SaveChangesAsync();
 
         // Assert
         var result = await repository.GetById(preferences.Id);
@@ -53,7 +52,6 @@ public class PreferencesRepositoryTests : IClassFixture<BifrostDbContextFixture>
             new Preferences { JobType = JobType.PartTime, SalaryRange = new SalaryRange { Min = 50000, Max = 75000 }, NeedSponsorship = false, NeedRelocation = true, SupabaseUserId = Guid.NewGuid() }
         };
         await repository.AddRange(preferences);
-        await context.SaveChangesAsync();
 
         // Act
         var result = await repository.GetAll();
@@ -74,7 +72,6 @@ public class PreferencesRepositoryTests : IClassFixture<BifrostDbContextFixture>
             new Preferences { JobType = JobType.PartTime, SalaryRange = new SalaryRange { Min = 50000, Max = 75000 }, NeedSponsorship = false, NeedRelocation = true, SupabaseUserId = Guid.NewGuid() }
         };
         await repository.AddRange(preferences);
-        await context.SaveChangesAsync();
 
         // Act
         var result = await repository.Find(p => p.JobType == JobType.FullTime);
@@ -92,11 +89,9 @@ public class PreferencesRepositoryTests : IClassFixture<BifrostDbContextFixture>
         var repository = new PreferencesRepository(context);
         var preferences = new Preferences { JobType = JobType.FullTime, SalaryRange = new SalaryRange { Min = 100000, Max = 150000 }, NeedSponsorship = true, NeedRelocation = false, SupabaseUserId = Guid.NewGuid() };
         await repository.Add(preferences);
-        await context.SaveChangesAsync();
 
         // Act
-        repository.Remove(preferences);
-        await context.SaveChangesAsync();
+        await repository.Remove(preferences);
 
         // Assert
         var result = await repository.GetById(preferences.Id);
@@ -115,11 +110,9 @@ public class PreferencesRepositoryTests : IClassFixture<BifrostDbContextFixture>
             new Preferences { JobType = JobType.PartTime, SalaryRange = new SalaryRange { Min = 50000, Max = 75000 }, NeedSponsorship = false, NeedRelocation = true, SupabaseUserId = Guid.NewGuid() }
         };
         await repository.AddRange(preferences);
-        await context.SaveChangesAsync();
 
         // Act
-        repository.RemoveRange(preferences);
-        await context.SaveChangesAsync();
+        await repository.RemoveRange(preferences);
 
         // Assert
         var result = await repository.GetAll();

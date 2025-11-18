@@ -7,4 +7,6 @@ public record UpdateJobRequest(
     string? Title,
     string? Company,
     string? Location,
-    string? Description);
+    string? Description,
+    bool? OfferSponsorship,
+    bool? OfferRelocation);

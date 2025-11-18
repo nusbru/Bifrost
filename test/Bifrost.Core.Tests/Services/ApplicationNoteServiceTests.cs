@@ -88,6 +88,7 @@ public class ApplicationNoteServiceTests
 
         // Assert
         result.Note.Should().Be("New text");
+        await _noteRepositoryMock.Received(1).Update(result);
     }
 
     [Fact]
@@ -128,7 +129,7 @@ public class ApplicationNoteServiceTests
         await _applicationNoteService.DeleteNoteAsync(1);
 
         // Assert
-        _noteRepositoryMock.Received(1).Remove(note);
+        await _noteRepositoryMock.Received(1).Remove(note);
     }
 
     [Fact]

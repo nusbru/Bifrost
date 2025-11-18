@@ -48,6 +48,7 @@ public class JobApplicationService : IJobApplicationService
         application.Status = newStatus;
         application.Updated = DateTime.UtcNow;
 
+        await _applicationRepository.Update(application);
         return application;
     }
 
@@ -58,7 +59,7 @@ public class JobApplicationService : IJobApplicationService
         var application = await _applicationRepository.GetById(applicationId)
             ?? throw new InvalidOperationException($"Job application with ID {applicationId} not found.");
 
-        _applicationRepository.Remove(application);
+        await _applicationRepository.Remove(application);
     }
 
     public async Task<JobApplication?> GetApplicationByIdAsync(long applicationId)

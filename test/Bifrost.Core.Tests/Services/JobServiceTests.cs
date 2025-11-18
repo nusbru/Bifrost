@@ -83,18 +83,23 @@ public class JobServiceTests
             Title = "Old Title",
             Company = "Old Company",
             Location = "Old Location",
-            Description = "Old Desc"
+            Description = "Old Desc",
+            OfferSponsorship = true,
+            OfferRelocation = false
         };
         _jobRepositoryMock.GetById(1).Returns(existingJob);
 
         // Act
-        var result = await _jobService.UpdateJobAsync(1, "New Title", "New Company", "New Location", "New Desc");
+        var result = await _jobService.UpdateJobAsync(1, "New Title", "New Company", "New Location", "New Desc", false, true);
 
         // Assert
         result.Title.Should().Be("New Title");
         result.Company.Should().Be("New Company");
         result.Location.Should().Be("New Location");
         result.Description.Should().Be("New Desc");
+        result.OfferSponsorship.Should().Be(false);
+        result.OfferRelocation.Should().Be(true);
+        await _jobRepositoryMock.Received(1).Update(result);
     }
 
     [Fact]
@@ -127,7 +132,7 @@ public class JobServiceTests
         await _jobService.DeleteJobAsync(1);
 
         // Assert
-        _jobRepositoryMock.Received(1).Remove(job);
+        await _jobRepositoryMock.Received(1).Remove(job);
     }
 
     [Fact]

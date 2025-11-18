@@ -24,7 +24,6 @@ public class JobRepositoryTests : IClassFixture<BifrostDbContextFixture>
 
         // Act
         await repository.Add(job);
-        await context.SaveChangesAsync();
 
         // Assert
         var result = await repository.GetById(job.Id);
@@ -44,7 +43,6 @@ public class JobRepositoryTests : IClassFixture<BifrostDbContextFixture>
             new Job { Title = "Product Manager", Company = "Microsoft", SupabaseUserId = Guid.NewGuid() }
         };
         await repository.AddRange(jobs);
-        await context.SaveChangesAsync();
 
         // Act
         var result = await repository.GetAll();
@@ -65,7 +63,6 @@ public class JobRepositoryTests : IClassFixture<BifrostDbContextFixture>
             new Job { Title = "Software Engineer", Company = "Microsoft", SupabaseUserId = Guid.NewGuid() }
         };
         await repository.AddRange(jobs);
-        await context.SaveChangesAsync();
 
         // Act
         var result = await repository.Find(j => j.Company == "Google");
@@ -83,15 +80,35 @@ public class JobRepositoryTests : IClassFixture<BifrostDbContextFixture>
         var repository = new JobRepository(context);
         var job = new Job { Title = "Software Engineer", Company = "Google", SupabaseUserId = Guid.NewGuid() };
         await repository.Add(job);
-        await context.SaveChangesAsync();
 
         // Act
-        repository.Remove(job);
-        await context.SaveChangesAsync();
+        await repository.Remove(job);
 
         // Assert
         var result = await repository.GetById(job.Id);
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Update_ShouldUpdateJob()
+    {
+        // Arrange
+        using var context = _fixture.CreateContext();
+        var repository = new JobRepository(context);
+        var job = new Job { Title = "Software Engineer", Company = "Google", SupabaseUserId = Guid.NewGuid() };
+        await repository.Add(job);
+        var originalId = job.Id;
+
+        // Act
+        job.Title = "Senior Software Engineer";
+        job.Company = "Microsoft";
+        await repository.Update(job);
+
+        // Assert
+        var result = await repository.GetById(originalId);
+        result.Should().NotBeNull();
+        result.Title.Should().Be("Senior Software Engineer");
+        result.Company.Should().Be("Microsoft");
     }
 
     [Fact]
@@ -106,11 +123,9 @@ public class JobRepositoryTests : IClassFixture<BifrostDbContextFixture>
             new Job { Title = "Product Manager", Company = "Microsoft", SupabaseUserId = Guid.NewGuid() }
         };
         await repository.AddRange(jobs);
-        await context.SaveChangesAsync();
 
         // Act
-        repository.RemoveRange(jobs);
-        await context.SaveChangesAsync();
+        await repository.RemoveRange(jobs);
 
         // Assert
         var result = await repository.GetAll();

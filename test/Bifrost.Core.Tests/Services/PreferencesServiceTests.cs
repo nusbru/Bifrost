@@ -80,17 +80,24 @@ public class PreferencesServiceTests
         var preferences = new Preferences
         {
             Id = 1,
-            SalaryRange = new SalaryRange { Min = 50000m, Max = 100000m }
+            SalaryRange = new SalaryRange { Min = 50000m, Max = 100000m },
+            JobType = Core.Enums.JobType.FullTime,
+            NeedSponsorship = true,
+            NeedRelocation = true
         };
         _preferencesRepositoryMock.GetById(1).Returns(preferences);
 
         // Act
         var result = await _preferencesService.UpdatePreferencesAsync(
-            1, 60000m, 120000m, "FullTime,PartTime", "Remote");
+            1, 60000m, 120000m, (int)Core.Enums.JobType.PartTime, false, false);
 
         // Assert
         result.SalaryRange.Min.Should().Be(60000m);
         result.SalaryRange.Max.Should().Be(120000m);
+        result.JobType.Should().Be(Core.Enums.JobType.PartTime);
+        result.NeedSponsorship.Should().Be(false);
+        result.NeedRelocation.Should().Be(false);
+        await _preferencesRepositoryMock.Received(1).Update(result);
     }
 
     [Fact]
@@ -98,7 +105,7 @@ public class PreferencesServiceTests
     {
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _preferencesService.UpdatePreferencesAsync(0, 50000, 100000, "", ""));
+            _preferencesService.UpdatePreferencesAsync(0, 50000, 100000, null, null));
     }
 
     [Fact]
@@ -110,7 +117,7 @@ public class PreferencesServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _preferencesService.UpdatePreferencesAsync(1, 100000, 50000, "", ""));
+            _preferencesService.UpdatePreferencesAsync(1, 100000, 50000, null, null));
     }
 
     [Fact]
@@ -121,7 +128,7 @@ public class PreferencesServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _preferencesService.UpdatePreferencesAsync(999, 50000, 100000, "", ""));
+            _preferencesService.UpdatePreferencesAsync(999, 50000, 100000, null, null));
     }
 
     [Fact]
@@ -135,7 +142,7 @@ public class PreferencesServiceTests
         await _preferencesService.DeletePreferencesAsync(1);
 
         // Assert
-        _preferencesRepositoryMock.Received(1).Remove(preferences);
+        await _preferencesRepositoryMock.Received(1).Remove(preferences);
     }
 
     [Fact]

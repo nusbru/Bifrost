@@ -60,8 +60,9 @@ public static class PreferencesEndpoints
                 preferences.SupabaseUserId,
                 preferences.SalaryRange.Min,
                 preferences.SalaryRange.Max,
-                "",
-                "",
+                (int)preferences.JobType,
+                preferences.NeedSponsorship,
+                preferences.NeedRelocation,
                 preferences.CreatedAt ?? DateTime.UtcNow,
                 preferences.UpdatedAt);
 
@@ -100,8 +101,9 @@ public static class PreferencesEndpoints
                 preferences.SupabaseUserId,
                 preferences.SalaryRange.Min,
                 preferences.SalaryRange.Max,
-                "",
-                "",
+                (int)preferences.JobType,
+                preferences.NeedSponsorship,
+                preferences.NeedRelocation,
                 preferences.CreatedAt ?? DateTime.UtcNow,
                 preferences.UpdatedAt);
 
@@ -129,16 +131,18 @@ public static class PreferencesEndpoints
                 preferenceId,
                 request.MinSalary,
                 request.MaxSalary,
-                request.PreferredJobTypes,
-                request.PreferredLocations);
+                request.JobType,
+                request.NeedSponsorship,
+                request.NeedRelocation);
 
             var response = new PreferencesResponse(
                 preferences.Id,
                 preferences.SupabaseUserId,
                 preferences.SalaryRange.Min,
                 preferences.SalaryRange.Max,
-                "",
-                "",
+                (int)preferences.JobType,
+                preferences.NeedSponsorship,
+                preferences.NeedRelocation,
                 preferences.CreatedAt ?? DateTime.UtcNow,
                 preferences.UpdatedAt);
 

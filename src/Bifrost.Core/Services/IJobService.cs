@@ -17,7 +17,7 @@ public interface IJobService
     /// <summary>
     /// Updates an existing job.
     /// </summary>
-    Task<Job> UpdateJobAsync(long jobId, string title, string company, string location, string description);
+    Task<Job> UpdateJobAsync(long jobId, string? title, string? company, string? location, string? description, bool? offerSponsorship = null, bool? offerRelocation = null);
 
     /// <summary>
     /// Deletes a job by ID.

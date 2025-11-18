@@ -146,7 +146,7 @@ public class PreferencesEndpointsTests
     {
         // Arrange
         var preferencesId = 1L;
-        var request = new UpdatePreferencesRequest(60000m, 120000m, "FullTime,Contract", "US,CA");
+        var request = new UpdatePreferencesRequest(60000m, 120000m, 1, false, false);
 
         var preferences = new Preferences
         {
@@ -154,16 +154,17 @@ public class PreferencesEndpointsTests
             SupabaseUserId = Guid.NewGuid(),
             JobType = Core.Enums.JobType.FullTime,
             SalaryRange = new SalaryRange { Min = 60000, Max = 120000 },
-            NeedSponsorship = false
+            NeedSponsorship = false,
+            NeedRelocation = false
         };
 
-        _preferencesServiceMock.UpdatePreferencesAsync(preferencesId, 60000m, 120000m, "FullTime,Contract", "US,CA")
+        _preferencesServiceMock.UpdatePreferencesAsync(preferencesId, 60000m, 120000m, 1, false, false)
             .Returns(preferences);
 
         // Act
         var response = await _app.Services
             .GetRequiredService<IPreferencesService>()
-            .UpdatePreferencesAsync(preferencesId, 60000m, 120000m, "FullTime,Contract", "US,CA");
+            .UpdatePreferencesAsync(preferencesId, 60000m, 120000m, 1, false, false);
 
         // Assert
         response.Should().NotBeNull();
@@ -176,14 +177,14 @@ public class PreferencesEndpointsTests
     {
         // Arrange
         _preferencesServiceMock
-            .UpdatePreferencesAsync(999, 50000m, 100000m, "FullTime", "US")
+            .UpdatePreferencesAsync(999, 50000m, 100000m, 1, null, null)
             .Returns(Task.FromException<Preferences>(new InvalidOperationException("Preferences not found")));
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _app.Services
                 .GetRequiredService<IPreferencesService>()
-                .UpdatePreferencesAsync(999, 50000m, 100000m, "FullTime", "US"));
+                .UpdatePreferencesAsync(999, 50000m, 100000m, 1, null, null));
     }
 
     [Fact]
