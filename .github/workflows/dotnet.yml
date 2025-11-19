@@ -1,4 +1,4 @@
-name: .Build and Run
+name: Build and Test
 
 on:
   push:
@@ -8,65 +8,188 @@ on:
 
 jobs:
   build:
-
+    name: Build Solution
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v5
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
+
     - name: Restore dependencies
       run: dotnet restore Bifrost.sln
+
     - name: Build
-      run: dotnet build --no-restore Bifrost.sln
-    - name: Test
-      run: dotnet test --no-build --verbosity normal Bifrost.sln
+      run: dotnet build --no-restore --configuration Release Bifrost.sln
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          **/bin/Release/**
+          **/obj/Release/**
+        retention-days: 1
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore Bifrost.sln
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release Bifrost.sln
+
+    - name: Run Unit Tests
+      run: |
+        dotnet test test/Bifrost.Api.Tests/Bifrost.Api.Tests.csproj \
+          --no-build \
+          --configuration Release \
+          --verbosity normal \
+          --logger "trx;LogFileName=api-tests.trx" \
+          --collect:"XPlat Code Coverage" \
+          --settings coverlet.runsettings
+
+        dotnet test test/Bifrost.Core.Tests/Bifrost.Core.Tests.csproj \
+          --no-build \
+          --configuration Release \
+          --verbosity normal \
+          --logger "trx;LogFileName=core-tests.trx" \
+          --collect:"XPlat Code Coverage" \
+          --settings coverlet.runsettings
+
+        dotnet test test/Bifrost.Infrastructure.Tests/Bifrost.Infrastructure.Tests.csproj \
+          --no-build \
+          --configuration Release \
+          --verbosity normal \
+          --logger "trx;LogFileName=infrastructure-tests.trx" \
+          --collect:"XPlat Code Coverage" \
+          --settings coverlet.runsettings
+
+    - name: Upload Unit Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: unit-test-results
+        path: |
+          **/TestResults/**/*.trx
+          **/TestResults/**/coverage.opencover.xml
+        retention-days: 30
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore Bifrost.sln
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release Bifrost.sln
+
+    - name: Run Integration Tests
+      run: |
+        dotnet test test/Bifrost.Integration.Tests/Bifrost.Integration.Tests.csproj \
+          --no-build \
+          --configuration Release \
+          --verbosity normal \
+          --logger "trx;LogFileName=integration-tests.trx" \
+          --collect:"XPlat Code Coverage" \
+          --settings coverlet.runsettings
+
+    - name: Upload Integration Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: integration-test-results
+        path: |
+          **/TestResults/**/*.trx
+          **/TestResults/**/coverage.opencover.xml
+        retention-days: 30
+
+  coverage:
+    name: Code Coverage Report
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    if: always()
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Download Unit Test Results
+      uses: actions/download-artifact@v4
+      with:
+        name: unit-test-results
+        path: test-results/unit
+
+    - name: Download Integration Test Results
+      uses: actions/download-artifact@v4
+      with:
+        name: integration-test-results
+        path: test-results/integration
+
     - name: Create coverage directory
       run: mkdir -p ${{ github.workspace }}/coverage
-    - name: Collect Code Coverage
+
+    - name: Copy all coverage files
       run: |
-        dotnet test Bifrost.sln \
-          --no-build \
-          --verbosity normal \
-          --settings coverlet.runsettings \
-          --collect:"XPlat Code Coverage"
-    - name: Copy coverage files
+        find ${{ github.workspace }}/test-results -name "coverage.opencover.xml" -exec cp {} ${{ github.workspace }}/coverage/ \;
+        # Rename files to avoid conflicts
+        cd ${{ github.workspace }}/coverage
+        counter=1
+        for file in coverage.opencover.xml; do
+          if [ -f "$file" ]; then
+            if [ $counter -eq 1 ]; then
+              mv "$file" "unit-coverage.opencover.xml"
+            else
+              mv "$file" "coverage-${counter}.opencover.xml"
+            fi
+            counter=$((counter + 1))
+          fi
+        done
+
+    - name: Debug - List coverage files
       run: |
-        mkdir -p ${{ github.workspace }}/coverage
-        find ${{ github.workspace }}/test -name "coverage.opencover.xml" -exec cp {} ${{ github.workspace }}/coverage/ \;
-    - name: Debug - Check for coverage files
-      run: |
-        echo "=== Checking entire workspace for coverage files ==="
-        find ${{ github.workspace }} -name "*.opencover.xml" -o -name "coverage.*" 2>/dev/null | head -30
-        echo "=== Listing coverage directory ==="
-        ls -lah ${{ github.workspace }}/coverage/ 2>/dev/null || echo "coverage directory empty or not found"
-        echo "=== Listing test directories ==="
-        find ${{ github.workspace }}/test -name "coverage" -type d 2>/dev/null
-        echo "=== Checking for any coverage-related files ==="
-        find ${{ github.workspace }}/test -type f -name "*coverage*" 2>/dev/null | head -20
+        echo "=== Coverage files found ==="
+        find ${{ github.workspace }}/coverage -name "*.opencover.xml" -ls
+
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
     - name: Generate Coverage Report
       if: hashFiles(format('{0}/coverage/*.opencover.xml', github.workspace)) != ''
       run: |
         reportgenerator \
           -reports:"${{ github.workspace }}/coverage/*.opencover.xml" \
           -targetdir:"${{ github.workspace }}/coverage/report" \
-          -reporttypes:"Html;Badges"
-    - name: Coverage Report Not Found
-      if: hashFiles(format('{0}/coverage/*.opencover.xml', github.workspace)) == ''
-      run: |
-        echo "WARNING: Coverage files not found at expected location"
-        echo "Checking for coverage files in test directories..."
-        find ${{ github.workspace }}/test -name "*.opencover.xml" -exec echo "Found: {}" \;
-    - name: Upload Coverage Results to GitHub
+          -reporttypes:"Html;Badges;Cobertura"
+
+    - name: Upload Coverage Results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: coverage-results
+        name: coverage-report
         path: |
           coverage/
-          test/**/coverage.opencover.xml
         retention-days: 30
