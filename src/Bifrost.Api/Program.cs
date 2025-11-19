@@ -1,7 +1,10 @@
+using System.Runtime.CompilerServices;
 using Bifrost.Api.Endpoints;
 using Bifrost.Core.Services;
 using Bifrost.Infrastructure;
 using Scalar.AspNetCore;
+
+[assembly: InternalsVisibleTo("Bifrost.Integration.Tests")]
 
 namespace Bifrost.Api;
 

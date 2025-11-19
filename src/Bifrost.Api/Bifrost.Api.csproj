@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <InternalsVisibleTo>Bifrost.Integration.Tests</InternalsVisibleTo>
     </PropertyGroup>
 
     <ItemGroup>

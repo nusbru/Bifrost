@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Bifrost",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
