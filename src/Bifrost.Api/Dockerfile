@@ -8,7 +8,10 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Bifrost.Api/Bifrost.Api.csproj", "src/Bifrost.Api/"]
-RUN dotnet restore "src/Bifrost.Api/Bifrost.Api.csproj"
+COPY ["src/Bifrost.Contracts/Bifrost.Contracts.csproj", "src/Bifrost.Contracts/"]
+COPY ["src/Bifrost.Core/Bifrost.Core.csproj", "src/Bifrost.Core/"]
+COPY ["src/Bifrost.Infrastructure/Bifrost.Infrastructure.csproj", "src/Bifrost.Infrastructure/"]
+RUN dotnet restore "./src/Bifrost.Api/Bifrost.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Bifrost.Api"
 RUN dotnet build "./Bifrost.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
