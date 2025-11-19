@@ -34,15 +34,22 @@ If you want to run Bifrost on your own machine, we've made it super easy using D
     cd Bifrost
     ```
 
-2. **Start the application**:
-    Run the following command in your terminal to start the database and the application:
+2. **Start the database**:
+    We use Docker to run the PostgreSQL database. Run this command to start it:
 
     ```bash
     docker-compose up -d
     ```
 
-3. **Access the Application**:
+3. **Run the application**:
+    Now, start the Bifrost API using the .NET CLI:
+
+    ```bash
+    dotnet run --project src/Bifrost.Api
+    ```
+
+4. **Access the Application**:
     Once everything is running, you can explore the API documentation here:
-    👉 <https://localhost:7001/docs>
+    👉 <https://localhost:5037/docs>
 
 Happy job hunting! 🎉
