@@ -152,14 +152,13 @@ describe("DashboardPage Component", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/job applications dashboard/i)).toBeInTheDocument();
+      // Check status cards are displayed (using getAllByText since text appears multiple times)
+      expect(screen.getAllByText("Not Applied").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Applied").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("In Process").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Waiting Feedback").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Waiting Job Offer").length).toBeGreaterThan(0);
     });
-
-    // Check status cards are displayed (using getAllByText since text appears multiple times)
-    expect(screen.getAllByText("Not Applied").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Applied").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("In Process").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Waiting Feedback").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Waiting Job Offer").length).toBeGreaterThan(0);
   });
 
   it("should display correct counts for each status", async () => {
@@ -199,11 +198,10 @@ describe("DashboardPage Component", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/total applications:/i)).toBeInTheDocument();
+      // Check total count
+      const totalCounts = screen.getAllByText("2");
+      expect(totalCounts.length).toBeGreaterThan(0);
     });
-
-    // Check total count
-    const totalCounts = screen.getAllByText("2");
-    expect(totalCounts.length).toBeGreaterThan(0);
   });
 
   it("should display error message when API call fails", async () => {
@@ -299,6 +297,7 @@ describe("DashboardPage Component", () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
+      expect(screen.getByText(/job applications dashboard/i)).toBeInTheDocument();
       expect(getUserJobApplications).toHaveBeenCalledWith(
         mockUserInfo.id,
         mockUserInfo.accessToken
