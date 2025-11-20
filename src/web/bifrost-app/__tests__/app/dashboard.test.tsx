@@ -32,13 +32,13 @@ describe("DashboardPage Component", () => {
     accessToken: "mock-token",
     refreshToken: "mock-refresh",
   };
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue({
       push: mockPush,
     });
-    
+
     // Mock localStorage
     Object.defineProperty(window, "localStorage", {
       value: {
@@ -61,18 +61,19 @@ describe("DashboardPage Component", () => {
         getUser: jest.fn().mockResolvedValue({ data: { user: { id: "mock-user" } } }),
       },
     });
-    
+
     (getUserJobApplications as jest.Mock).mockImplementation(
       () => new Promise(() => {}) // Never resolves to keep loading state
     );
 
     render(<DashboardPage />);
-    
-    const loader = screen.getByRole("img", { hidden: true });
-    expect(loader).toBeInTheDocument();
-  });
 
-  it("should redirect to login if user is not authenticated", async () => {
+    // Check for the loading spinner SVG
+    const loader = screen.getByText((content, element) => {
+      return element?.classList.contains('lucide-loader-circle') ?? false;
+    });
+    expect(loader).toBeInTheDocument();
+  });  it("should redirect to login if user is not authenticated", async () => {
     const { createClient } = require("@/lib/supabase/client");
     createClient.mockReturnValue({
       auth: {
@@ -91,8 +92,8 @@ describe("DashboardPage Component", () => {
     const { createClient } = require("@/lib/supabase/client");
     createClient.mockReturnValue({
       auth: {
-        getUser: jest.fn().mockResolvedValue({ 
-          data: { user: { id: "mock-user" } } 
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
         }),
       },
     });
@@ -110,8 +111,8 @@ describe("DashboardPage Component", () => {
     const { createClient } = require("@/lib/supabase/client");
     createClient.mockReturnValue({
       auth: {
-        getUser: jest.fn().mockResolvedValue({ 
-          data: { user: { id: "mock-user" } } 
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
         }),
       },
     });
@@ -153,20 +154,20 @@ describe("DashboardPage Component", () => {
       expect(screen.getByText(/job applications dashboard/i)).toBeInTheDocument();
     });
 
-    // Check status cards are displayed
-    expect(screen.getByText("Not Applied")).toBeInTheDocument();
-    expect(screen.getByText("Applied")).toBeInTheDocument();
-    expect(screen.getByText("In Process")).toBeInTheDocument();
-    expect(screen.getByText("Waiting Feedback")).toBeInTheDocument();
-    expect(screen.getByText("Waiting Job Offer")).toBeInTheDocument();
+    // Check status cards are displayed (using getAllByText since text appears multiple times)
+    expect(screen.getAllByText("Not Applied").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Applied").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("In Process").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Waiting Feedback").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Waiting Job Offer").length).toBeGreaterThan(0);
   });
 
   it("should display correct counts for each status", async () => {
     const { createClient } = require("@/lib/supabase/client");
     createClient.mockReturnValue({
       auth: {
-        getUser: jest.fn().mockResolvedValue({ 
-          data: { user: { id: "mock-user" } } 
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
         }),
       },
     });
@@ -209,8 +210,8 @@ describe("DashboardPage Component", () => {
     const { createClient } = require("@/lib/supabase/client");
     createClient.mockReturnValue({
       auth: {
-        getUser: jest.fn().mockResolvedValue({ 
-          data: { user: { id: "mock-user" } } 
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
         }),
       },
     });
@@ -231,8 +232,8 @@ describe("DashboardPage Component", () => {
     const { createClient } = require("@/lib/supabase/client");
     createClient.mockReturnValue({
       auth: {
-        getUser: jest.fn().mockResolvedValue({ 
-          data: { user: { id: "mock-user" } } 
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
         }),
       },
     });
@@ -251,11 +252,11 @@ describe("DashboardPage Component", () => {
   it("should handle logout correctly", async () => {
     const { createClient } = require("@/lib/supabase/client");
     const mockSignOut = jest.fn().mockResolvedValue({});
-    
+
     createClient.mockReturnValue({
       auth: {
-        getUser: jest.fn().mockResolvedValue({ 
-          data: { user: { id: "mock-user" } } 
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
         }),
         signOut: mockSignOut,
       },
@@ -285,8 +286,8 @@ describe("DashboardPage Component", () => {
     const { createClient } = require("@/lib/supabase/client");
     createClient.mockReturnValue({
       auth: {
-        getUser: jest.fn().mockResolvedValue({ 
-          data: { user: { id: "mock-user" } } 
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
         }),
       },
     });

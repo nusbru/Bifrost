@@ -57,7 +57,7 @@ export async function getJobApplicationsByStatus(
   token: string
 ): Promise<ApiResponse<JobApplication[]>> {
   const response = await getUserJobApplications(userId, token);
-  
+
   if (response.error || !response.data) {
     return response;
   }

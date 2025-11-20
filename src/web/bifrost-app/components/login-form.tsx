@@ -38,7 +38,7 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      
+
       // Save user information to localStorage
       if (data.session && data.user) {
         const userInfo = {
@@ -49,7 +49,7 @@ export function LoginForm({
         };
         localStorage.setItem("userInfo", JSON.stringify(userInfo));
       }
-      
+
       // Redirect to dashboard after successful login
       router.push("/dashboard");
     } catch (error: unknown) {
