@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
+  // Disable cacheComponents for authenticated dynamic routes
+  cacheComponents: false,
 };
 
 export default nextConfig;

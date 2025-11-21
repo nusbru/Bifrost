@@ -131,3 +131,122 @@ export async function getJobApplications(
     };
   }
 }
+
+/**
+ * Creates a new job application
+ * POST /api/applications
+ * @param userId - The user's ID
+ * @param jobId - The job ID to apply for
+ * @param token - JWT authentication token
+ * @returns Promise with the created job application or error
+ */
+export async function createJobApplication(
+  userId: string,
+  jobId: number,
+  token: string
+): Promise<ApiResponse<JobApplication>> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/applications`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ userId, jobId }),
+    });
+
+    if (!response.ok) {
+      const problemDetails: ProblemDetails = await response.json().catch(() => ({}));
+      return {
+        error: problemDetails.detail || `Failed to create job application: ${response.statusText}`,
+      };
+    }
+
+    const data = await response.json();
+    return { data };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}
+
+/**
+ * Updates a job application status
+ * PUT /api/applications/{applicationId}/status
+ * @param applicationId - The application ID
+ * @param status - The new status
+ * @param token - JWT authentication token
+ * @returns Promise with the updated job application or error
+ */
+export async function updateJobApplicationStatus(
+  applicationId: number,
+  status: number,
+  token: string
+): Promise<ApiResponse<JobApplication>> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/applications/${applicationId}/status`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    if (!response.ok) {
+      const problemDetails: ProblemDetails = await response.json().catch(() => ({}));
+      return {
+        error: problemDetails.detail || `Failed to update job application status: ${response.statusText}`,
+      };
+    }
+
+    const data = await response.json();
+    return { data };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}
+
+/**
+ * Deletes a job application
+ * DELETE /api/applications/{applicationId}
+ * @param applicationId - The application ID
+ * @param token - JWT authentication token
+ * @returns Promise with success or error
+ */
+export async function deleteJobApplication(
+  applicationId: number,
+  token: string
+): Promise<ApiResponse<void>> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/applications/${applicationId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const problemDetails: ProblemDetails = await response.json().catch(() => ({}));
+      return {
+        error: problemDetails.detail || `Failed to delete job application: ${response.statusText}`,
+      };
+    }
+
+    return { data: undefined };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}
