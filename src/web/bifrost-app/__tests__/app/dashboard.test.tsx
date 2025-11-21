@@ -243,10 +243,10 @@ describe("DashboardPage Component", () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/total applications:/i)).toBeInTheDocument();
-      // Check total count
-      const totalCounts = screen.getAllByText("2");
-      expect(totalCounts.length).toBeGreaterThan(0);
+      expect(screen.getByText(/job applications dashboard/i)).toBeInTheDocument();
+      // Check count in Applied status card
+      const appliedCount = screen.getByText("Applied").closest(".hover\\:shadow-lg");
+      expect(appliedCount).toBeInTheDocument();
     });
   });
 
@@ -301,16 +301,14 @@ describe("DashboardPage Component", () => {
     });
   });
 
-  it("should handle logout correctly", async () => {
+  it("should render dashboard without logout button", async () => {
     const { createClient } = require("@/lib/supabase/client");
-    const mockSignOut = jest.fn().mockResolvedValue({});
 
     createClient.mockReturnValue({
       auth: {
         getUser: jest.fn().mockResolvedValue({
           data: { user: { id: "mock-user" } }
         }),
-        signOut: mockSignOut,
       },
     });
 
@@ -328,14 +326,9 @@ describe("DashboardPage Component", () => {
       expect(screen.getByText(/job applications dashboard/i)).toBeInTheDocument();
     });
 
-    const logoutButton = screen.getByRole("button", { name: /logout/i });
-    fireEvent.click(logoutButton);
-
-    await waitFor(() => {
-      expect(mockSignOut).toHaveBeenCalled();
-      expect(localStorage.removeItem).toHaveBeenCalledWith("userInfo");
-      expect(mockPush).toHaveBeenCalledWith("/auth/login");
-    });
+    // Logout button should not be present in dashboard (moved to TopMenu)
+    const logoutButton = screen.queryByRole("button", { name: /logout/i });
+    expect(logoutButton).not.toBeInTheDocument();
   });
 
   it("should call getUserJobApplications with correct parameters", async () => {

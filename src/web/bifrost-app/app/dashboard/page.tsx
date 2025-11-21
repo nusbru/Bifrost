@@ -12,7 +12,6 @@ import {
 import { getUserJobApplications } from "@/lib/api/job-applications";
 import { getUserJobs } from "@/lib/api/jobs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
 interface ApplicationWithJob extends JobApplication {
@@ -129,13 +128,6 @@ export default function DashboardPage() {
     fetchData();
   }, [router]);
 
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    localStorage.removeItem("userInfo");
-    router.push("/auth/login");
-  };
-
   // Filter applications by status
   const notApplied = applications.filter(
     (app) => app.status === JobApplicationStatus.NotApplied
@@ -163,18 +155,13 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Job Applications Dashboard</h1>
-          {userInfo && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Welcome, {userInfo.email}
-            </p>
-          )}
-        </div>
-        <Button onClick={handleLogout} variant="outline">
-          Logout
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold">Job Applications Dashboard</h1>
+        {userInfo && (
+          <p className="text-sm text-muted-foreground mt-1">
+            Welcome, {userInfo.email}
+          </p>
+        )}
       </div>
 
       {error && (
@@ -219,58 +206,6 @@ export default function DashboardPage() {
           applications={waitingJobOffer}
           color="bg-green-500"
         />
-      </div>
-
-      <div className="mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p className="text-lg">
-                Total Applications:{" "}
-                <span className="font-bold">{applications.length}</span>
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-600">
-                    {notApplied.length}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Not Applied</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600">
-                    {applied.length}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Applied</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {inProcess.length}
-                  </p>
-                  <p className="text-xs text-muted-foreground">In Process</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-orange-600">
-                    {waitingFeedback.length}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Waiting Feedback
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {waitingJobOffer.length}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Waiting Job Offer
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

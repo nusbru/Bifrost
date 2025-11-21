@@ -45,7 +45,7 @@ describe("Job Applications API Client", () => {
       const result = await getUserJobApplications(mockUserId, mockToken);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        `https://localhost:7001/api/applications/user/${mockUserId}`,
+        `http://localhost:5037/api/applications/user/${mockUserId}`,
         {
           method: "GET",
           headers: {
@@ -110,7 +110,7 @@ describe("Job Applications API Client", () => {
       const result = await getJobApplication(1, mockToken);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://localhost:7001/api/applications/1",
+        "http://localhost:5037/api/applications/1",
         {
           method: "GET",
           headers: {
@@ -174,7 +174,7 @@ describe("Job Applications API Client", () => {
       const result = await getJobApplications(1, mockToken);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://localhost:7001/api/applications/job/1",
+        "http://localhost:5037/api/applications/job/1",
         {
           method: "GET",
           headers: {
