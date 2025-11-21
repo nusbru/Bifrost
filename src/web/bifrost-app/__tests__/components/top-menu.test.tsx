@@ -20,7 +20,7 @@ describe("TopMenu Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     (useRouter as jest.Mock).mockReturnValue({
       push: mockPush,
     });
@@ -47,7 +47,7 @@ describe("TopMenu Component", () => {
 
   it("should render the TopMenu component", () => {
     render(<TopMenu />);
-    
+
     expect(screen.getByText("Bifrost")).toBeInTheDocument();
     expect(screen.getByText("New Job")).toBeInTheDocument();
     expect(screen.getByText("Job Applications")).toBeInTheDocument();
@@ -57,7 +57,7 @@ describe("TopMenu Component", () => {
 
   it("should have correct navigation links", () => {
     render(<TopMenu />);
-    
+
     const newJobLink = screen.getByRole("link", { name: /create new job posting/i });
     const applicationsLink = screen.getByRole("link", { name: /view job applications/i });
     const preferencesLink = screen.getByRole("link", { name: /manage user preferences/i });
@@ -69,11 +69,11 @@ describe("TopMenu Component", () => {
 
   it("should highlight active navigation link", () => {
     (usePathname as jest.Mock).mockReturnValue("/dashboard");
-    
+
     render(<TopMenu />);
-    
+
     const applicationsLink = screen.getByRole("link", { name: /view job applications/i });
-    
+
     expect(applicationsLink).toHaveClass("bg-primary");
     expect(applicationsLink).toHaveClass("text-primary-foreground");
     expect(applicationsLink).toHaveAttribute("aria-current", "page");
@@ -81,12 +81,12 @@ describe("TopMenu Component", () => {
 
   it("should not highlight inactive navigation links", () => {
     (usePathname as jest.Mock).mockReturnValue("/dashboard");
-    
+
     render(<TopMenu />);
-    
+
     const newJobLink = screen.getByRole("link", { name: /create new job posting/i });
     const preferencesLink = screen.getByRole("link", { name: /manage user preferences/i });
-    
+
     expect(newJobLink).toHaveClass("text-muted-foreground");
     expect(preferencesLink).toHaveClass("text-muted-foreground");
     expect(newJobLink).not.toHaveAttribute("aria-current");
@@ -95,22 +95,22 @@ describe("TopMenu Component", () => {
 
   it("should render brand logo with correct link", () => {
     render(<TopMenu />);
-    
+
     const logo = screen.getByRole("link", { name: /bifrost - go to dashboard/i });
-    
+
     expect(logo).toHaveAttribute("href", "/dashboard");
     expect(logo).toHaveTextContent("Bifrost");
   });
 
   it("should handle logout correctly", async () => {
     mockSignOut.mockResolvedValue({});
-    
+
     render(<TopMenu />);
-    
+
     const logoutButton = screen.getByRole("button", { name: /logout from application/i });
-    
+
     fireEvent.click(logoutButton);
-    
+
     await waitFor(() => {
       expect(mockSignOut).toHaveBeenCalledTimes(1);
       expect(localStorage.removeItem).toHaveBeenCalledWith("userInfo");
@@ -122,13 +122,13 @@ describe("TopMenu Component", () => {
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     const logoutError = new Error("Logout failed");
     mockSignOut.mockRejectedValue(logoutError);
-    
+
     render(<TopMenu />);
-    
+
     const logoutButton = screen.getByRole("button", { name: /logout from application/i });
-    
+
     fireEvent.click(logoutButton);
-    
+
     await waitFor(() => {
       expect(consoleErrorSpy).toHaveBeenCalledWith("Logout error:", logoutError);
     });
@@ -138,36 +138,36 @@ describe("TopMenu Component", () => {
 
   it("should render all menu icons", () => {
     const { container } = render(<TopMenu />);
-    
+
     // Check that SVG icons are present (they have aria-hidden="true")
     const icons = container.querySelectorAll('svg[aria-hidden="true"]');
-    
+
     // We expect 4 icons: PlusIcon, ListIcon, SettingsIcon, LogOut icon
     expect(icons.length).toBe(4);
   });
 
   it("should apply custom className prop", () => {
     const { container } = render(<TopMenu className="custom-class" />);
-    
+
     const nav = container.querySelector("nav");
-    
+
     expect(nav).toHaveClass("custom-class");
   });
 
   it("should have proper accessibility attributes", () => {
     render(<TopMenu />);
-    
+
     const nav = screen.getByRole("navigation", { name: /main navigation/i });
-    
+
     expect(nav).toBeInTheDocument();
     expect(nav).toHaveAttribute("aria-label", "Main navigation");
   });
 
   it("should render logout button with correct styling", () => {
     render(<TopMenu />);
-    
+
     const logoutButton = screen.getByRole("button", { name: /logout from application/i });
-    
+
     expect(logoutButton).toHaveClass("flex");
     expect(logoutButton).toHaveClass("items-center");
     expect(logoutButton).toHaveClass("gap-2");
@@ -183,11 +183,11 @@ describe("TopMenu Component", () => {
     testCases.forEach(({ path, expectedActive }) => {
       it(`should highlight ${expectedActive} when on ${path}`, () => {
         (usePathname as jest.Mock).mockReturnValue(path);
-        
+
         render(<TopMenu />);
-        
+
         const activeLink = screen.getByText(expectedActive).closest("a");
-        
+
         expect(activeLink).toHaveClass("bg-primary");
         expect(activeLink).toHaveAttribute("aria-current", "page");
       });

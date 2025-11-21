@@ -79,13 +79,14 @@ export function TopMenu({ className = "" }: TopMenuProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     active
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   }`}
                   aria-label={item.ariaLabel}
                   aria-current={active ? "page" : undefined}
+                  prefetch={true}
                 >
                   <Icon className="h-4 w-4" aria-hidden="true" />
                   <span>{item.label}</span>
