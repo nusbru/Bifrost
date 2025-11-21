@@ -17,6 +17,18 @@ public class Program
         // Add services to the container.
         builder.Services.AddAuthorization();
 
+        // Configure CORS to allow frontend requests
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
+
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
@@ -43,15 +55,19 @@ public class Program
             });
         }
 
+        /// Configure the HTTP request pipeline.
+        app.UseHttpsRedirection();
+
+        // Enable CORS before authorization
+        app.UseCors("AllowFrontend");
+
+        app.UseAuthorization();
+
         // Map API endpoints
         app.MapJobEndpoints();
         app.MapJobApplicationEndpoints();
         app.MapApplicationNoteEndpoints();
         app.MapPreferencesEndpoints();
-
-        /// Configure the HTTP request pipeline.
-        app.UseHttpsRedirection();
-        app.UseAuthorization();
 
         app.Run();
     }

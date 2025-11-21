@@ -4,20 +4,26 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
+  Job,
   JobApplication,
   JobApplicationStatus,
   UserInfo,
 } from "@/lib/types";
 import { getUserJobApplications } from "@/lib/api/job-applications";
+import { getUserJobs } from "@/lib/api/jobs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+
+interface ApplicationWithJob extends JobApplication {
+  job?: Job;
+}
 
 interface StatusCardProps {
   title: string;
   count: number;
   status: JobApplicationStatus;
-  applications: JobApplication[];
+  applications: ApplicationWithJob[];
   color: string;
 }
 
@@ -38,7 +44,7 @@ function StatusCard({ title, count, applications, color }: StatusCardProps) {
             <ul className="space-y-1">
               {applications.slice(0, 3).map((app) => (
                 <li key={app.id} className="text-sm truncate">
-                  Job ID: {app.jobId}
+                  {app.job ? `${app.job.title} at ${app.job.company}` : `Job ID: ${app.jobId}`}
                 </li>
               ))}
             </ul>
@@ -50,14 +56,14 @@ function StatusCard({ title, count, applications, color }: StatusCardProps) {
 }
 
 export default function DashboardPage() {
-  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [applications, setApplications] = useState<ApplicationWithJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchApplications() {
+    async function fetchData() {
       try {
         // Check if user is authenticated
         const supabase = createClient();
@@ -80,27 +86,47 @@ export default function DashboardPage() {
         const parsedUserInfo: UserInfo = JSON.parse(storedUserInfo);
         setUserInfo(parsedUserInfo);
 
-        // Fetch job applications
-        const response = await getUserJobApplications(
-          parsedUserInfo.id,
-          parsedUserInfo.accessToken
-        );
+        // Fetch job applications and jobs in parallel
+        const [applicationsResponse, jobsResponse] = await Promise.all([
+          getUserJobApplications(
+            parsedUserInfo.id,
+            parsedUserInfo.accessToken
+          ),
+          getUserJobs(
+            parsedUserInfo.id,
+            parsedUserInfo.accessToken
+          ),
+        ]);
 
-        if (response.error) {
-          setError(response.error);
-        } else if (response.data) {
-          setApplications(response.data);
+        if (applicationsResponse.error) {
+          setError(applicationsResponse.error);
+          return;
+        }
+
+        if (jobsResponse.error) {
+          setError(jobsResponse.error);
+          return;
+        }
+
+        // Combine applications with job details
+        if (applicationsResponse.data && jobsResponse.data) {
+          const jobsMap = new Map(jobsResponse.data.map((job) => [job.id, job]));
+          const applicationsWithJobs = applicationsResponse.data.map((app) => ({
+            ...app,
+            job: jobsMap.get(app.jobId),
+          }));
+          setApplications(applicationsWithJobs);
         }
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Failed to load applications"
+          err instanceof Error ? err.message : "Failed to load dashboard data"
         );
       } finally {
         setIsLoading(false);
       }
     }
 
-    fetchApplications();
+    fetchData();
   }, [router]);
 
   const handleLogout = async () => {

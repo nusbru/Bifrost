@@ -2,6 +2,7 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import DashboardPage from "@/app/dashboard/page";
 import { useRouter } from "next/navigation";
 import { getUserJobApplications } from "@/lib/api/job-applications";
+import { getUserJobs } from "@/lib/api/jobs";
 import { JobApplicationStatus } from "@/lib/types";
 
 // Mock next/navigation
@@ -22,6 +23,10 @@ jest.mock("@/lib/supabase/client", () => ({
 // Mock API functions
 jest.mock("@/lib/api/job-applications", () => ({
   getUserJobApplications: jest.fn(),
+}));
+
+jest.mock("@/lib/api/jobs", () => ({
+  getUserJobs: jest.fn(),
 }));
 
 describe("DashboardPage Component", () => {
@@ -63,6 +68,10 @@ describe("DashboardPage Component", () => {
     });
 
     (getUserJobApplications as jest.Mock).mockImplementation(
+      () => new Promise(() => {}) // Never resolves to keep loading state
+    );
+
+    (getUserJobs as jest.Mock).mockImplementation(
       () => new Promise(() => {}) // Never resolves to keep loading state
     );
 
@@ -144,8 +153,41 @@ describe("DashboardPage Component", () => {
       },
     ];
 
+    const mockJobs = [
+      {
+        id: 101,
+        title: "Software Engineer",
+        company: "Tech Corp",
+        location: "Remote",
+        jobType: 0,
+        description: "Great opportunity",
+        offerSponsorship: true,
+        offerRelocation: false,
+        userId: "mock-user",
+        createdAt: "2024-01-01",
+        updatedAt: null,
+      },
+      {
+        id: 102,
+        title: "Senior Developer",
+        company: "Startup Inc",
+        location: "New York",
+        jobType: 0,
+        description: "Exciting role",
+        offerSponsorship: false,
+        offerRelocation: true,
+        userId: "mock-user",
+        createdAt: "2024-01-02",
+        updatedAt: null,
+      },
+    ];
+
     (getUserJobApplications as jest.Mock).mockResolvedValue({
       data: mockApplications,
+    });
+
+    (getUserJobs as jest.Mock).mockResolvedValue({
+      data: mockJobs,
     });
 
     render(<DashboardPage />);
@@ -194,6 +236,10 @@ describe("DashboardPage Component", () => {
       data: mockApplications,
     });
 
+    (getUserJobs as jest.Mock).mockResolvedValue({
+      data: [],
+    });
+
     render(<DashboardPage />);
 
     await waitFor(() => {
@@ -219,6 +265,10 @@ describe("DashboardPage Component", () => {
       error: errorMessage,
     });
 
+    (getUserJobs as jest.Mock).mockResolvedValue({
+      data: [],
+    });
+
     render(<DashboardPage />);
 
     await waitFor(() => {
@@ -237,6 +287,10 @@ describe("DashboardPage Component", () => {
     });
 
     (getUserJobApplications as jest.Mock).mockResolvedValue({
+      data: [],
+    });
+
+    (getUserJobs as jest.Mock).mockResolvedValue({
       data: [],
     });
 
@@ -261,6 +315,10 @@ describe("DashboardPage Component", () => {
     });
 
     (getUserJobApplications as jest.Mock).mockResolvedValue({
+      data: [],
+    });
+
+    (getUserJobs as jest.Mock).mockResolvedValue({
       data: [],
     });
 
@@ -294,11 +352,100 @@ describe("DashboardPage Component", () => {
       data: [],
     });
 
+    (getUserJobs as jest.Mock).mockResolvedValue({
+      data: [],
+    });
+
     render(<DashboardPage />);
 
     await waitFor(() => {
       expect(screen.getByText(/job applications dashboard/i)).toBeInTheDocument();
       expect(getUserJobApplications).toHaveBeenCalledWith(
+        mockUserInfo.id,
+        mockUserInfo.accessToken
+      );
+    });
+  });
+
+  it("should display job details with applications", async () => {
+    const { createClient } = require("@/lib/supabase/client");
+    createClient.mockReturnValue({
+      auth: {
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
+        }),
+      },
+    });
+
+    const mockApplications = [
+      {
+        id: 1,
+        jobId: 101,
+        userId: "mock-user",
+        status: JobApplicationStatus.Applied,
+        created: "2024-01-01",
+        updated: "2024-01-01",
+      },
+    ];
+
+    const mockJobs = [
+      {
+        id: 101,
+        title: "Software Engineer",
+        company: "Tech Corp",
+        location: "Remote",
+        jobType: 0,
+        description: "Great opportunity",
+        offerSponsorship: true,
+        offerRelocation: false,
+        userId: "mock-user",
+        createdAt: "2024-01-01",
+        updatedAt: null,
+      },
+    ];
+
+    (getUserJobApplications as jest.Mock).mockResolvedValue({
+      data: mockApplications,
+    });
+
+    (getUserJobs as jest.Mock).mockResolvedValue({
+      data: mockJobs,
+    });
+
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/software engineer at tech corp/i)).toBeInTheDocument();
+    });
+  });
+
+  it("should call both getUserJobApplications and getUserJobs in parallel", async () => {
+    const { createClient } = require("@/lib/supabase/client");
+    createClient.mockReturnValue({
+      auth: {
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: "mock-user" } }
+        }),
+      },
+    });
+
+    (getUserJobApplications as jest.Mock).mockResolvedValue({
+      data: [],
+    });
+
+    (getUserJobs as jest.Mock).mockResolvedValue({
+      data: [],
+    });
+
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/job applications dashboard/i)).toBeInTheDocument();
+      expect(getUserJobApplications).toHaveBeenCalledWith(
+        mockUserInfo.id,
+        mockUserInfo.accessToken
+      );
+      expect(getUserJobs).toHaveBeenCalledWith(
         mockUserInfo.id,
         mockUserInfo.accessToken
       );
