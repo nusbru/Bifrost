@@ -102,7 +102,7 @@ export default function JobApplicationsPage() {
 
   const handleDelete = async (applicationId: number) => {
     if (!userInfo) return;
-    
+
     if (!confirm("Are you sure you want to delete this application?")) {
       return;
     }

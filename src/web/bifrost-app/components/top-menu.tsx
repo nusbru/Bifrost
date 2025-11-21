@@ -39,7 +39,7 @@ export function TopMenu({ className = "" }: TopMenuProps) {
       ariaLabel: "Create new job posting",
     },
     {
-      href: "/dashboard",
+      href: "/applications",
       label: "Job Applications",
       icon: ListIcon,
       ariaLabel: "View job applications",
