@@ -418,8 +418,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
+# Environment files - NEVER commit real credentials
+.env
 .env*.local
+.env.production
+.env.development
 
 # vercel
 .vercel

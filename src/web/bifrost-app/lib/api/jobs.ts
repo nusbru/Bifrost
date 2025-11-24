@@ -1,5 +1,22 @@
+/**
+ * @deprecated This file is deprecated. Use server actions from @/lib/actions/jobs instead.
+ *
+ * Migration guide:
+ * - getUserJobs() → getUserJobsAction()
+ * - getJobById() → getJobByIdAction()
+ * - createJob() → createJobAction()
+ * - updateJob() → updateJobAction()
+ * - deleteJob() → deleteJobAction()
+ *
+ * Server actions run on the server and keep API URLs secure.
+ * They provide better security by not exposing the API endpoint to the client.
+ */
+
 import { Job } from "@/lib/types";
 
+/**
+ * @deprecated Use server actions instead
+ */
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5037";
 
 export interface ApiResponse<T> {

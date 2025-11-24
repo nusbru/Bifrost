@@ -20,6 +20,51 @@
     networks:
       - bifrost-network
 
+  api:
+    build:
+      context: .
+      dockerfile: src/Bifrost.Api/Dockerfile
+    container_name: bifrost-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=BifrostDB;Username=bifrost_user;Password=bifrost_pass;Port=5432
+    ports:
+      - "5037:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bifrost-network
+
+  web:
+    build:
+      context: ./src/web/bifrost-app
+      dockerfile: Dockerfile
+      args:
+        # Build-time arguments - ONLY for client-side public configuration
+        # These values are baked into the JavaScript bundle and visible in browser
+        # They are NOT secrets - users can see them in DevTools
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-https://<some random characters>.supabase.co}
+        - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-sb_publishable_<some random characters>}
+    container_name: bifrost-web
+    restart: unless-stopped
+    environment:
+      # Runtime environment variables - server-side ONLY (not exposed to browser)
+      # These can be changed without rebuilding the image
+      # API calls now go through Next.js Server Actions, keeping the API URL secure
+      - API_URL=http://api:8080
+      - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-https://<some random characters>.supabase.co}
+      # Uncomment when you need server-side admin operations:
+      # - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - bifrost-network
+
 volumes:
   bifrost_data:
     driver: local
