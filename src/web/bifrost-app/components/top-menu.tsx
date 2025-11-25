@@ -4,7 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LogOut, BriefcaseIcon, ListIcon, SettingsIcon, PlusIcon } from "lucide-react";
+import { LogOut, BriefcaseIcon, ListIcon, SettingsIcon } from "lucide-react";
 
 interface TopMenuProps {
   className?: string;

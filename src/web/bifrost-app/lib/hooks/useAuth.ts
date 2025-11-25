@@ -57,7 +57,7 @@ export function useAuth(): UseAuthReturn {
       }
 
       setUser(user);
-    } catch (error) {
+    } catch (_error) {
       router.push(ROUTES.LOGIN);
     } finally {
       setIsLoading(false);

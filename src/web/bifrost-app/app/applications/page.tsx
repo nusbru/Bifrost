@@ -16,7 +16,7 @@ import { getStatusLabel } from "@/lib/utils/job-status";
 import { MESSAGES, ROUTES } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Loader2, Plus, Trash2, Eye } from "lucide-react";
 
 interface ApplicationWithJob extends JobApplication {
   job?: Job;

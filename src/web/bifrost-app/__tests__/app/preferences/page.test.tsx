@@ -3,7 +3,7 @@
  * Tests CRUD operations, form validation, and user interactions
  */
 
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import PreferencesPage from "@/app/preferences/page";

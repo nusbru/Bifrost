@@ -27,7 +27,7 @@ import Link from "next/link";
  * Follows Single Responsibility Principle - manages single application view and status updates
  */
 export default function ApplicationDetailsPage() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: _authLoading } = useAuth();
   const [application, setApplication] = useState<JobApplication | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<number>(0);
@@ -35,7 +35,7 @@ export default function ApplicationDetailsPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const router = useRouter();
+  const _router = useRouter();
   const params = useParams();
   const applicationId = params.id ? String(params.id) : null;
 

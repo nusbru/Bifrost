@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks";
 import { createJobAction } from "@/lib/actions/jobs";
 import { JobType } from "@/lib/types";
-import { MESSAGES, ROUTES } from "@/lib/constants";
+import { MESSAGES } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

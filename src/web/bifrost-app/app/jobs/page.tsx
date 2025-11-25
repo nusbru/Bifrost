@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/hooks";
 import { getUserJobsAction, deleteJobAction } from "@/lib/actions/jobs";
 import { Job, JobType } from "@/lib/types";
-import { MESSAGES, ROUTES } from "@/lib/constants";
+import { MESSAGES } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

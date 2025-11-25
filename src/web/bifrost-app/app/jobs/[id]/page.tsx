@@ -9,7 +9,7 @@ import React, { useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/hooks";
 import { getJobByIdAction, updateJobAction } from "@/lib/actions/jobs";
-import { Job, JobType } from "@/lib/types";
+import { JobType } from "@/lib/types";
 import { MESSAGES } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

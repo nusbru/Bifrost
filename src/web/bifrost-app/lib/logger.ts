@@ -16,7 +16,7 @@ interface LogEntry {
 /**
  * Format log entry for console output
  */
-function formatLogEntry(entry: LogEntry): string {
+function formatLogEntry(_entry: LogEntry): string {
   const { level, message, timestamp, error, context } = entry;
   let output = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
 
@@ -35,7 +35,7 @@ function formatLogEntry(entry: LogEntry): string {
  * Send log to external service (implement as needed)
  * Could be Sentry, LogRocket, Datadog, etc.
  */
-function sendToExternalService(entry: LogEntry): void {
+function sendToExternalService(_entry: LogEntry): void {
   // TODO: Implement external logging service integration
   // Example: Sentry.captureException(entry.error, { extra: entry.context });
 }
@@ -44,7 +44,7 @@ function sendToExternalService(entry: LogEntry): void {
  * Base logging function
  */
 function log(level: LogLevel, message: string, error?: unknown, context?: Record<string, unknown>): void {
-  const entry: LogEntry = {
+  const _entry: LogEntry = {
     level,
     message,
     timestamp: new Date().toISOString(),

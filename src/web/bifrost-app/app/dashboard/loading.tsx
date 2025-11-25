@@ -4,7 +4,7 @@
  */
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+
 
 export default function Loading() {
   return (
