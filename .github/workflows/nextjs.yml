@@ -56,15 +56,6 @@ jobs:
       env:
         NODE_ENV: production
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: nextjs-build
-        path: |
-          src/web/bifrost-app/.next/
-          src/web/bifrost-app/public/
-        retention-days: 1
-
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -93,39 +84,47 @@ jobs:
       env:
         NODE_ENV: test
 
-
-
-  coverage:
-    name: Coverage
-    runs-on: ubuntu-latest
-    needs: [test]
-
-    steps:
-    - name: Upload coverage reports
+    - name: Upload coverage for reporting
       uses: actions/upload-artifact@v4
       if: always()
       with:
+        name: test-coverage
+        path: src/web/bifrost-app/coverage/
+        retention-days: 1
+
+  coverage:
+    name: Upload Coverage Reports
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: always()
+
+    steps:
+    - name: Download coverage artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: test-coverage
+        path: src/web/bifrost-app/coverage/
+
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      with:
         name: coverage-reports
-        path: |
-          src/web/bifrost-app/coverage/
+        path: src/web/bifrost-app/coverage/
         retention-days: 30
 
-    - name: Upload coverage to workflow artifacts (Cobertura)
+    - name: Upload coverage (Cobertura)
       uses: actions/upload-artifact@v4
-      if: always()
       with:
         name: coverage-cobertura
         path: src/web/bifrost-app/coverage/cobertura-coverage.xml
         retention-days: 30
 
-    - name: Upload coverage to workflow artifacts (LCOV)
+    - name: Upload coverage (LCOV)
       uses: actions/upload-artifact@v4
-      if: always()
       with:
         name: coverage-lcov
         path: src/web/bifrost-app/coverage/lcov.info
         retention-days: 30
-
 
   type-check:
     name: TypeScript Type Check
