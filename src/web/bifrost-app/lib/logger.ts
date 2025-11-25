@@ -17,7 +17,7 @@ interface LogEntry {
  * Format log entry for console output
  */
 function formatLogEntry(_entry: LogEntry): string {
-  const { level, message, timestamp, error, context } = entry;
+  const { level, message, timestamp, error, context } = _entry;
   let output = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
 
   if (context) {
@@ -54,7 +54,7 @@ function log(level: LogLevel, message: string, error?: unknown, context?: Record
 
   // Always log to console in development
   if (process.env.NODE_ENV === "development") {
-    const formattedMessage = formatLogEntry(entry);
+    const formattedMessage = formatLogEntry(_entry);
 
     switch (level) {
       case "error":
@@ -74,7 +74,7 @@ function log(level: LogLevel, message: string, error?: unknown, context?: Record
 
   // Send errors to external service in production
   if (process.env.NODE_ENV === "production" && level === "error") {
-    sendToExternalService(entry);
+    sendToExternalService(_entry);
   }
 }
 
