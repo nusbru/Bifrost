@@ -34,10 +34,10 @@ export function TopMenu({ className = "" }: TopMenuProps) {
 
   const menuItems = [
     {
-      href: "/jobs/new",
-      label: "New Job",
-      icon: PlusIcon,
-      ariaLabel: "Create new job posting",
+      href: "/jobs",
+      label: "Jobs",
+      icon: BriefcaseIcon,
+      ariaLabel: "View all jobs",
     },
     {
       href: "/applications",
