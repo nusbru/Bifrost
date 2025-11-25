@@ -89,7 +89,7 @@ jobs:
       run: npm ci
 
     - name: Run tests with coverage
-      run: npm test -- --ci --coverage --maxWorkers=2 --coverageReporters="json" --coverageReporters="json-summary" --coverageReporters="lcov" --coverageReporters="text" --coverageReporters="text-summary" --coverageReporters="html" --coverageReporters="cobertura"
+      run: npm test -- --ci --coverage --maxWorkers=2
       env:
         NODE_ENV: test
 
