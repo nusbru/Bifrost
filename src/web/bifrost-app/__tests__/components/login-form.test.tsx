@@ -88,7 +88,7 @@ describe("LoginForm Component", () => {
     });
   });
 
-  it("should save user information to localStorage on successful login", async () => {
+  it("should complete login successfully without errors", async () => {
     const mockToken = "mock-jwt-token-12345";
     const mockRefreshToken = "mock-refresh-token-67890";
     const mockUserId = "mock-user-id-uuid";
@@ -127,17 +127,20 @@ describe("LoginForm Component", () => {
     await user.type(passwordInput, "password123");
     await user.click(submitButton);
 
+    // Verify that signInWithPassword was called successfully
     await waitFor(() => {
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        "userInfo",
-        JSON.stringify({
-          id: mockUserId,
-          email: mockEmail,
-          accessToken: mockToken,
-          refreshToken: mockRefreshToken,
-        })
-      );
+      expect(mockSignIn).toHaveBeenCalledWith({
+        email: mockEmail,
+        password: "password123",
+      });
     });
+
+    // Verify no error is displayed
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+    // Session is automatically stored in cookies by Supabase (not localStorage)
+    // Verify localStorage is NOT used for session storage
+    expect(localStorage.setItem).not.toHaveBeenCalled();
   });
 
   it("should redirect to dashboard after successful login", async () => {

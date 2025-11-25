@@ -50,6 +50,22 @@ export interface Job {
   updatedAt: string | null;
 }
 
+/**
+ * Preferences Response from API
+ * Matches the PreferencesResponse schema from OpenAPI
+ */
+export interface Preferences {
+  id: number;
+  userId: string;
+  minSalary: number;
+  maxSalary: number;
+  jobType: number;
+  needSponsorship: boolean;
+  needRelocation: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
 export interface UserInfo {
   id: string;
   email: string;

@@ -49,7 +49,7 @@ describe("TopMenu Component", () => {
     render(<TopMenu />);
 
     expect(screen.getByText("Bifrost")).toBeInTheDocument();
-    expect(screen.getByText("New Job")).toBeInTheDocument();
+    expect(screen.getByText("Jobs")).toBeInTheDocument();
     expect(screen.getByText("Job Applications")).toBeInTheDocument();
     expect(screen.getByText("My Preferences")).toBeInTheDocument();
     expect(screen.getByText("Logout")).toBeInTheDocument();
@@ -58,17 +58,17 @@ describe("TopMenu Component", () => {
   it("should have correct navigation links", () => {
     render(<TopMenu />);
 
-    const newJobLink = screen.getByRole("link", { name: /create new job posting/i });
+    const jobsLink = screen.getByRole("link", { name: /view all jobs/i });
     const applicationsLink = screen.getByRole("link", { name: /view job applications/i });
     const preferencesLink = screen.getByRole("link", { name: /manage user preferences/i });
 
-    expect(newJobLink).toHaveAttribute("href", "/jobs/new");
-    expect(applicationsLink).toHaveAttribute("href", "/dashboard");
+    expect(jobsLink).toHaveAttribute("href", "/jobs");
+    expect(applicationsLink).toHaveAttribute("href", "/applications");
     expect(preferencesLink).toHaveAttribute("href", "/preferences");
   });
 
   it("should highlight active navigation link", () => {
-    (usePathname as jest.Mock).mockReturnValue("/dashboard");
+    (usePathname as jest.Mock).mockReturnValue("/applications");
 
     render(<TopMenu />);
 
@@ -80,16 +80,16 @@ describe("TopMenu Component", () => {
   });
 
   it("should not highlight inactive navigation links", () => {
-    (usePathname as jest.Mock).mockReturnValue("/dashboard");
+    (usePathname as jest.Mock).mockReturnValue("/applications");
 
     render(<TopMenu />);
 
-    const newJobLink = screen.getByRole("link", { name: /create new job posting/i });
+    const jobsLink = screen.getByRole("link", { name: /view all jobs/i });
     const preferencesLink = screen.getByRole("link", { name: /manage user preferences/i });
 
-    expect(newJobLink).toHaveClass("text-muted-foreground");
+    expect(jobsLink).toHaveClass("text-muted-foreground");
     expect(preferencesLink).toHaveClass("text-muted-foreground");
-    expect(newJobLink).not.toHaveAttribute("aria-current");
+    expect(jobsLink).not.toHaveAttribute("aria-current");
     expect(preferencesLink).not.toHaveAttribute("aria-current");
   });
 
@@ -142,7 +142,7 @@ describe("TopMenu Component", () => {
     // Check that SVG icons are present (they have aria-hidden="true")
     const icons = container.querySelectorAll('svg[aria-hidden="true"]');
 
-    // We expect 4 icons: PlusIcon, ListIcon, SettingsIcon, LogOut icon
+    // We expect 4 icons: BriefcaseIcon, ListIcon, SettingsIcon, LogOut icon
     expect(icons.length).toBe(4);
   });
 
@@ -175,8 +175,8 @@ describe("TopMenu Component", () => {
 
   describe("Navigation active state", () => {
     const testCases = [
-      { path: "/jobs/new", expectedActive: "New Job" },
-      { path: "/dashboard", expectedActive: "Job Applications" },
+      { path: "/jobs", expectedActive: "Jobs" },
+      { path: "/applications", expectedActive: "Job Applications" },
       { path: "/preferences", expectedActive: "My Preferences" },
     ];
 

@@ -1,5 +1,15 @@
 import '@testing-library/jest-dom'
 
+// Mock ResizeObserver for Radix UI components
+global.ResizeObserver = class ResizeObserver {
+  constructor(callback) {
+    this.callback = callback;
+  }
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 // Suppress act() warnings in tests - these are expected in async components
 // and don't affect test correctness with React 19
 const originalError = console.error;
