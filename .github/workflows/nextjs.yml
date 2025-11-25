@@ -1,4 +1,4 @@
-name: Next.js CI/CD
+name: Bifrost Web Build and Test
 
 on:
   push:
