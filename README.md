@@ -2,54 +2,116 @@
 
 Welcome to **Bifrost**! 👋
 
-Job hunting can feel like a full-time job in itself. Between juggling spreadsheets, sticky notes, and endless email threads, it's easy to lose track of that perfect opportunity.
+Job hunting can feel overwhelming. Between juggling spreadsheets, sticky notes, and endless email threads, it's easy to lose track of opportunities or forget important details from that interview last week.
 
-**Bifrost** is here to bring calm to the chaos. It's a simple, personal tool designed to help you organize your job search journey, so you can focus on what matters most: landing your dream job! 🚀
+**Bifrost** is here to bring order to the chaos. Think of it as your personal assistant for job hunting – it organizes everything in one place so you can focus on what really matters: landing your next great opportunity! 🚀
 
-## ✨ What Can Bifrost Do For You?
+## ✨ What Makes Bifrost Special?
 
-* **🎯 Track Opportunities**: Save interesting job postings in one place. No more "Where did I see that link again?"
-* **📝 Manage Applications**: Keep tabs on every application. Know exactly when you applied and what stage you're at (Applied, Interviewing, Offer!).
-* **💭 Keep Notes**: Store your thoughts, interview feedback, and important details right alongside the job info.
-* **⚙️ Set Your Preferences**: Define what you're looking for so you stay focused on your goals.
+Bifrost helps you stay organized throughout your entire job search journey:
 
-Think of Bifrost as your personal assistant for your career growth. It remembers the details so you don't have to!
+* **🎯 Save Jobs You Love**: Bookmark interesting positions with all the details – company name, job title, location, and the link to apply. Never lose track of "that perfect job" again!
+
+* **📊 Track Your Applications**: Watch your progress unfold. See at a glance which applications are pending, which ones led to interviews, and celebrate those offers!
+
+* **💭 Capture Your Thoughts**: Add notes after phone screens, jot down interview questions you were asked, or remember that great question you want to ask the hiring manager.
+
+* **⚙️ Set Your Goals**: Define what you're looking for (remote work? relocation support? salary range?) and keep your search focused on what matters to you.
+
+* **🔒 Keep It Private**: Your data stays yours. Bifrost is designed with privacy in mind – your job search is personal, and we keep it that way.
+
+Think of Bifrost as the notebook you wish you had for your last job search, but better organized and always available! 📓✨
 
 ---
 
-## 🛠️ How to Run Locally (For Developers)
+## 🚀 Getting Started
 
-If you want to run Bifrost on your own machine, we've made it super easy using Docker.
+Ready to take control of your job search? Here's how to get Bifrost up and running!
 
-### Prerequisites
+### What You'll Need
 
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+* **Docker Desktop** – This helps run Bifrost on your computer. [Download it here](https://www.docker.com/products/docker-desktop/) (it's free!)
+* **A Supabase account** – Used for secure authentication. [Sign up here](https://supabase.com) (also free!)
+* **A few minutes** – We've made this as simple as possible!
 
-### Quick Start
+### Let's Get You Set Up
 
-1. **Clone the repository**:
+#### Step 1: Download Bifrost
 
-    ```bash
-    git clone https://github.com/nusbru/Bifrost.git
-    cd Bifrost
-    ```
+```bash
+git clone https://github.com/nusbru/Bifrost.git
+cd Bifrost
+```
 
-2. **Start the database**:
-    We use Docker to run the PostgreSQL database. Run this command to start it:
+#### Step 2: Set Up Your Supabase Account
 
-    ```bash
-    docker-compose up -d
-    ```
+Bifrost uses Supabase for secure user authentication. Here's how to get your credentials:
 
-3. **Run the application**:
-    Now, start the Bifrost API using the .NET CLI:
+1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
+2. Create a new project (give it any name you like!)
+3. Once your project is ready, go to **Project Settings** → **API**
+4. You'll see two important values:
+   * **Project URL** (looks like `https://xxxxx.supabase.co`)
+   * **anon/public key** (a long string of characters)
 
-    ```bash
-    dotnet run --project src/Bifrost.Api
-    ```
+#### Step 3: Configure Your Environment
 
-4. **Access the Application**:
-    Once everything is running, you can explore the API documentation here:
-    👉 <https://localhost:5037/docs>
+Now let's tell Bifrost about your Supabase project:
 
-Happy job hunting! 🎉
+1. In the Bifrost folder, make a copy of the example environment file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Open the `.env` file in any text editor
+3. Replace the placeholder values with your Supabase credentials:
+
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-anon-key-here
+   ```
+
+   *(Paste your actual Project URL and anon key from Step 2)*
+
+💡 **Tip:** These credentials are safe to use – they're public keys designed for client-side applications!
+
+#### Step 4: Start Everything with One Command
+
+We've packaged everything you need into Docker containers. Just run:
+
+```bash
+docker-compose up -d
+```
+
+This command starts:
+
+* 🗄️ Your personal database (where your job info is stored)
+* 🌐 The Bifrost application
+* 💻 The web interface
+
+#### Step 5: Open Bifrost in Your Browser
+
+Once everything starts (it takes about 30 seconds), visit:
+
+👉 **<http://localhost:3000>** – Your Bifrost dashboard
+
+You'll be greeted with a sign-in page. Create your account, and you're ready to go!
+
+Want to explore the technical side? Check out the API documentation at:
+
+👉 **<http://localhost:5037/docs>** – Interactive API explorer
+
+### That's It! 🎉
+
+You're ready to start organizing your job search. Create your account, add your first job posting, and see how much easier this makes everything!
+
+---
+
+## 🌟 License
+
+Bifrost is open source and available under the MIT License. Feel free to use it, modify it, and make it your own!
+
+---
+
+**Happy job hunting! May your pipeline be full and your offers be plenty!** 🎯✨
