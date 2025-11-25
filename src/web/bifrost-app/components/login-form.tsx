@@ -33,22 +33,14 @@ export function LoginForm({
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) throw error;
 
-      // Save user information to localStorage
-      if (data.session && data.user) {
-        const userInfo = {
-          id: data.user.id,
-          email: data.user.email || "",
-          accessToken: data.session.access_token,
-          refreshToken: data.session.refresh_token,
-        };
-        localStorage.setItem("userInfo", JSON.stringify(userInfo));
-      }
+      // Session is automatically stored in cookies by Supabase
+      // No need to manually store tokens in localStorage
 
       // Redirect to dashboard after successful login
       router.push("/dashboard");

@@ -1,174 +1,71 @@
-"use client";
+/**
+ * Dashboard Page - Server Component
+ * Displays job application statistics and overview
+ * Converted from Client Component for better performance
+ */
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import {
-  Job,
-  JobApplication,
-  JobApplicationStatus,
-  UserInfo,
-} from "@/lib/types";
-import { getUserJobApplications } from "@/lib/api/job-applications";
-import { getUserJobs } from "@/lib/api/jobs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { getUserJobApplicationsAction } from "@/lib/actions/job-applications";
+import { getUserJobsAction } from "@/lib/actions/jobs";
+import { Job, JobApplication, JobApplicationStatus } from "@/lib/types";
+import { StatusCard } from "@/components/dashboard/status-card";
+import { filterByStatus, getStatusColor } from "@/lib/utils/job-status";
+import { ROUTES } from "@/lib/constants";
 
 interface ApplicationWithJob extends JobApplication {
   job?: Job;
 }
 
-interface StatusCardProps {
-  title: string;
-  count: number;
-  status: JobApplicationStatus;
-  applications: ApplicationWithJob[];
-  color: string;
-}
+export default async function DashboardPage() {
+  // Check authentication server-side
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-function StatusCard({ title, count, applications, color }: StatusCardProps) {
-  return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <div className={`w-3 h-3 rounded-full ${color}`}></div>
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-bold mb-4">{count}</div>
-        {applications.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Recent applications:</p>
-            <ul className="space-y-1">
-              {applications.slice(0, 3).map((app) => (
-                <li key={app.id} className="text-sm truncate">
-                  {app.job ? `${app.job.title} at ${app.job.company}` : `Job ID: ${app.jobId}`}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+  if (!user) {
+    redirect(ROUTES.LOGIN);
+  }
 
-export default function DashboardPage() {
-  const [applications, setApplications] = useState<ApplicationWithJob[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const router = useRouter();
+  // Fetch data in parallel on the server
+  const [applicationsResponse, jobsResponse] = await Promise.all([
+    getUserJobApplicationsAction(),
+    getUserJobsAction(),
+  ]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // Check if user is authenticated
-        const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-          router.push("/auth/login");
-          return;
-        }
-
-        // Get user info from localStorage
-        const storedUserInfo = localStorage.getItem("userInfo");
-        if (!storedUserInfo) {
-          router.push("/auth/login");
-          return;
-        }
-
-        const parsedUserInfo: UserInfo = JSON.parse(storedUserInfo);
-        setUserInfo(parsedUserInfo);
-
-        // Fetch job applications and jobs in parallel
-        const [applicationsResponse, jobsResponse] = await Promise.all([
-          getUserJobApplications(
-            parsedUserInfo.id,
-            parsedUserInfo.accessToken
-          ),
-          getUserJobs(
-            parsedUserInfo.id,
-            parsedUserInfo.accessToken
-          ),
-        ]);
-
-        if (applicationsResponse.error) {
-          setError(applicationsResponse.error);
-          return;
-        }
-
-        if (jobsResponse.error) {
-          setError(jobsResponse.error);
-          return;
-        }
-
-        // Combine applications with job details
-        if (applicationsResponse.data && jobsResponse.data) {
-          const jobsMap = new Map(jobsResponse.data.map((job) => [job.id, job]));
-          const applicationsWithJobs = applicationsResponse.data.map((app) => ({
-            ...app,
-            job: jobsMap.get(app.jobId),
-          }));
-          setApplications(applicationsWithJobs);
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load dashboard data"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchData();
-  }, [router]);
-
-  // Filter applications by status
-  const notApplied = applications.filter(
-    (app) => app.status === JobApplicationStatus.NotApplied
-  );
-  const applied = applications.filter(
-    (app) => app.status === JobApplicationStatus.Applied
-  );
-  const inProcess = applications.filter(
-    (app) => app.status === JobApplicationStatus.InProcess
-  );
-  const waitingFeedback = applications.filter(
-    (app) => app.status === JobApplicationStatus.WaitingFeedback
-  );
-  const waitingJobOffer = applications.filter(
-    (app) => app.status === JobApplicationStatus.WaitingJobOffer
-  );
-
-  if (isLoading) {
+  // Handle errors
+  if (applicationsResponse.error || jobsResponse.error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="container mx-auto p-6">
+        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded">
+          {applicationsResponse.error || jobsResponse.error}
+        </div>
       </div>
     );
   }
+
+  // Combine applications with job details
+  const applications: ApplicationWithJob[] = applicationsResponse.data
+    ? applicationsResponse.data.map((app) => ({
+        ...app,
+        job: jobsResponse.data?.find((job) => job.id === app.jobId),
+      }))
+    : [];
+
+  // Filter applications by status using utility function
+  const notApplied = filterByStatus(applications, JobApplicationStatus.NotApplied);
+  const applied = filterByStatus(applications, JobApplicationStatus.Applied);
+  const inProcess = filterByStatus(applications, JobApplicationStatus.InProcess);
+  const waitingFeedback = filterByStatus(applications, JobApplicationStatus.WaitingFeedback);
+  const waitingJobOffer = filterByStatus(applications, JobApplicationStatus.WaitingJobOffer);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Job Applications Dashboard</h1>
-        {userInfo && (
-          <p className="text-sm text-muted-foreground mt-1">
-            Welcome, {userInfo.email}
-          </p>
-        )}
+        <p className="text-sm text-muted-foreground mt-1">Welcome, {user.email}</p>
       </div>
-
-      {error && (
-        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded">
-          {error}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatusCard
@@ -176,35 +73,35 @@ export default function DashboardPage() {
           count={notApplied.length}
           status={JobApplicationStatus.NotApplied}
           applications={notApplied}
-          color="bg-gray-400"
+          color={getStatusColor(JobApplicationStatus.NotApplied)}
         />
         <StatusCard
           title="Applied"
           count={applied.length}
           status={JobApplicationStatus.Applied}
           applications={applied}
-          color="bg-blue-500"
+          color={getStatusColor(JobApplicationStatus.Applied)}
         />
         <StatusCard
           title="In Process"
           count={inProcess.length}
           status={JobApplicationStatus.InProcess}
           applications={inProcess}
-          color="bg-yellow-500"
+          color={getStatusColor(JobApplicationStatus.InProcess)}
         />
         <StatusCard
           title="Waiting Feedback"
           count={waitingFeedback.length}
           status={JobApplicationStatus.WaitingFeedback}
           applications={waitingFeedback}
-          color="bg-orange-500"
+          color={getStatusColor(JobApplicationStatus.WaitingFeedback)}
         />
         <StatusCard
           title="Waiting Job Offer"
           count={waitingJobOffer.length}
           status={JobApplicationStatus.WaitingJobOffer}
           applications={waitingJobOffer}
-          color="bg-green-500"
+          color={getStatusColor(JobApplicationStatus.WaitingJobOffer)}
         />
       </div>
     </div>

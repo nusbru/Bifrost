@@ -13,20 +13,10 @@
 
 import { SERVER_API_URL } from "@/lib/config/server";
 import { JobApplication } from "@/lib/types";
+import { ApiResponse, ProblemDetails } from "@/lib/types/api";
 import { createClient } from "@/lib/supabase/server";
-
-export interface ApiResponse<T> {
-  data?: T;
-  error?: string;
-}
-
-export interface ProblemDetails {
-  type?: string;
-  title?: string;
-  status?: number;
-  detail?: string;
-  instance?: string;
-}
+import { logger } from "@/lib/logger";
+import { MESSAGES } from "@/lib/constants";
 
 /**
  * Get authentication token from current session
@@ -49,7 +39,7 @@ export async function getUserJobApplicationsAction(): Promise<ApiResponse<JobApp
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     // Get user ID from session
@@ -57,11 +47,11 @@ export async function getUserJobApplicationsAction(): Promise<ApiResponse<JobApp
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return { error: "User not found" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
-      `${SERVER_API_URL}/api/job-applications/user/${user.id}`,
+      `${SERVER_API_URL}/api/applications/user/${user.id}`,
       {
         method: "GET",
         headers: {
@@ -82,9 +72,9 @@ export async function getUserJobApplicationsAction(): Promise<ApiResponse<JobApp
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error("Error in getUserJobApplicationsAction:", error);
+    logger.error("Error in getUserJobApplicationsAction", error, { action: "getUserJobApplicationsAction" });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -101,11 +91,11 @@ export async function getJobApplicationsByJobIdAction(jobId: string): Promise<Ap
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
-      `${SERVER_API_URL}/api/job-applications/job/${jobId}`,
+      `${SERVER_API_URL}/api/applications/job/${jobId}`,
       {
         method: "GET",
         headers: {
@@ -126,9 +116,9 @@ export async function getJobApplicationsByJobIdAction(jobId: string): Promise<Ap
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error("Error in getJobApplicationsByJobIdAction:", error);
+    logger.error("Error in getJobApplicationsByJobIdAction", error, { action: "getJobApplicationsByJobIdAction", jobId });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -145,11 +135,11 @@ export async function getJobApplicationByIdAction(applicationId: string): Promis
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
-      `${SERVER_API_URL}/api/job-applications/${applicationId}`,
+      `${SERVER_API_URL}/api/applications/${applicationId}`,
       {
         method: "GET",
         headers: {
@@ -170,9 +160,9 @@ export async function getJobApplicationByIdAction(applicationId: string): Promis
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error("Error in getJobApplicationByIdAction:", error);
+    logger.error("Error in getJobApplicationByIdAction", error, { action: "getJobApplicationByIdAction", applicationId });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -181,17 +171,17 @@ export async function getJobApplicationByIdAction(applicationId: string): Promis
  * Creates a new job application
  * Server Action that securely calls the .NET backend API
  *
- * @param applicationData - The job application data to create
+ * @param jobId - The job ID to create an application for
  * @returns Promise with the created job application or error
  */
 export async function createJobApplicationAction(
-  applicationData: Omit<JobApplication, "id" | "createdAt" | "updatedAt" | "supabaseUserId">
+  jobId: number
 ): Promise<ApiResponse<JobApplication>> {
   try {
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     // Get user ID from session
@@ -199,11 +189,11 @@ export async function createJobApplicationAction(
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return { error: "User not found" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
-      `${SERVER_API_URL}/api/job-applications`,
+      `${SERVER_API_URL}/api/applications`,
       {
         method: "POST",
         headers: {
@@ -211,8 +201,8 @@ export async function createJobApplicationAction(
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          ...applicationData,
-          supabaseUserId: user.id,
+          userId: user.id,
+          jobId,
         }),
       }
     );
@@ -227,9 +217,9 @@ export async function createJobApplicationAction(
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error("Error in createJobApplicationAction:", error);
+    logger.error("Error in createJobApplicationAction", error, { action: "createJobApplicationAction", jobId });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -244,19 +234,19 @@ export async function createJobApplicationAction(
  */
 export async function updateJobApplicationStatusAction(
   applicationId: string,
-  status: string
+  status: number
 ): Promise<ApiResponse<void>> {
   try {
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
-      `${SERVER_API_URL}/api/job-applications/${applicationId}/status`,
+      `${SERVER_API_URL}/api/applications/${applicationId}/status`,
       {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -274,9 +264,9 @@ export async function updateJobApplicationStatusAction(
 
     return { data: undefined };
   } catch (error) {
-    console.error("Error in updateJobApplicationStatusAction:", error);
+    logger.error("Error in updateJobApplicationStatusAction", error, { action: "updateJobApplicationStatusAction", applicationId, status });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -293,11 +283,11 @@ export async function deleteJobApplicationAction(applicationId: string): Promise
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
-      `${SERVER_API_URL}/api/job-applications/${applicationId}`,
+      `${SERVER_API_URL}/api/applications/${applicationId}`,
       {
         method: "DELETE",
         headers: {
@@ -316,9 +306,9 @@ export async function deleteJobApplicationAction(applicationId: string): Promise
 
     return { data: undefined };
   } catch (error) {
-    console.error("Error in deleteJobApplicationAction:", error);
+    logger.error("Error in deleteJobApplicationAction", error, { action: "deleteJobApplicationAction", applicationId });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }

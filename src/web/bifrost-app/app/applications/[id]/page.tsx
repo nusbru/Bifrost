@@ -2,19 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/hooks";
 import {
   Job,
   JobApplication,
   JobApplicationStatus,
   JobType,
-  UserInfo,
 } from "@/lib/types";
 import {
-  getJobApplication,
-  updateJobApplicationStatus,
-} from "@/lib/api/job-applications";
-import { getJob } from "@/lib/api/jobs";
+  getJobApplicationByIdAction,
+  updateJobApplicationStatusAction,
+} from "@/lib/actions/job-applications";
+import { getJobByIdAction } from "@/lib/actions/jobs";
+import { getStatusLabel } from "@/lib/utils/job-status";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ import Link from "next/link";
  * Follows Single Responsibility Principle - manages single application view and status updates
  */
 export default function ApplicationDetailsPage() {
+  const { user, isLoading: authLoading } = useAuth();
   const [application, setApplication] = useState<JobApplication | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<number>(0);
@@ -34,16 +35,15 @@ export default function ApplicationDetailsPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const router = useRouter();
   const params = useParams();
-  const applicationId = params.id ? Number(params.id) : null;
+  const applicationId = params.id ? String(params.id) : null;
 
   useEffect(() => {
-    if (applicationId) {
+    if (user && applicationId) {
       fetchApplicationDetails();
     }
-  }, [applicationId, router]);
+  }, [user, applicationId]);
 
   const fetchApplicationDetails = async () => {
     if (!applicationId) return;
@@ -52,32 +52,8 @@ export default function ApplicationDetailsPage() {
       setIsLoading(true);
       setError(null);
 
-      // Check authentication
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/auth/login");
-        return;
-      }
-
-      // Get user info from localStorage
-      const storedUserInfo = localStorage.getItem("userInfo");
-      if (!storedUserInfo) {
-        router.push("/auth/login");
-        return;
-      }
-
-      const parsedUserInfo: UserInfo = JSON.parse(storedUserInfo);
-      setUserInfo(parsedUserInfo);
-
-      // Fetch application details
-      const appResponse = await getJobApplication(
-        applicationId,
-        parsedUserInfo.accessToken
-      );
+      // Fetch application details using server action
+      const appResponse = await getJobApplicationByIdAction(applicationId);
 
       if (appResponse.error) {
         setError(appResponse.error);
@@ -88,11 +64,8 @@ export default function ApplicationDetailsPage() {
         setApplication(appResponse.data);
         setSelectedStatus(appResponse.data.status);
 
-        // Fetch job details
-        const jobResponse = await getJob(
-          appResponse.data.jobId,
-          parsedUserInfo.accessToken
-        );
+        // Fetch job details using server action
+        const jobResponse = await getJobByIdAction(String(appResponse.data.jobId));
 
         if (jobResponse.error) {
           setError(jobResponse.error);
@@ -112,18 +85,22 @@ export default function ApplicationDetailsPage() {
     }
   };
 
-  const handleStatusUpdate = async () => {
-    if (!userInfo || !applicationId || !application) return;
+  const handleStatusUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!applicationId) {
+      setError("Invalid request");
+      return;
+    }
 
     try {
       setIsUpdating(true);
       setError(null);
       setSuccessMessage(null);
 
-      const response = await updateJobApplicationStatus(
+      const response = await updateJobApplicationStatusAction(
         applicationId,
-        selectedStatus,
-        userInfo.accessToken
+        selectedStatus
       );
 
       if (response.error) {
@@ -131,36 +108,16 @@ export default function ApplicationDetailsPage() {
         return;
       }
 
-      if (response.data) {
-        setApplication(response.data);
-        setSuccessMessage("Status updated successfully!");
-        setTimeout(() => setSuccessMessage(null), 3000);
-      }
+      // Refetch to get updated data
+      await fetchApplicationDetails();
+      setSuccessMessage("Status updated successfully!");
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to update status"
       );
     } finally {
       setIsUpdating(false);
-    }
-  };
-
-  const getStatusLabel = (status: number): string => {
-    switch (status) {
-      case JobApplicationStatus.NotApplied:
-        return "Not Applied";
-      case JobApplicationStatus.Applied:
-        return "Applied";
-      case JobApplicationStatus.InProcess:
-        return "In Process";
-      case JobApplicationStatus.WaitingFeedback:
-        return "Waiting Feedback";
-      case JobApplicationStatus.WaitingJobOffer:
-        return "Waiting Job Offer";
-      case JobApplicationStatus.Failed:
-        return "Failed";
-      default:
-        return "Unknown";
     }
   };
 

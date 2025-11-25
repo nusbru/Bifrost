@@ -13,20 +13,10 @@
 
 import { SERVER_API_URL } from "@/lib/config/server";
 import { Job } from "@/lib/types";
+import { ApiResponse, ProblemDetails } from "@/lib/types/api";
 import { createClient } from "@/lib/supabase/server";
-
-export interface ApiResponse<T> {
-  data?: T;
-  error?: string;
-}
-
-export interface ProblemDetails {
-  type?: string;
-  title?: string;
-  status?: number;
-  detail?: string;
-  instance?: string;
-}
+import { logger } from "@/lib/logger";
+import { MESSAGES } from "@/lib/constants";
 
 /**
  * Get authentication token from current session
@@ -82,9 +72,9 @@ export async function getUserJobsAction(): Promise<ApiResponse<Job[]>> {
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error("Error in getUserJobsAction:", error);
+    logger.error("Error in getUserJobsAction", error, { action: "getUserJobsAction" });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -101,7 +91,7 @@ export async function getJobByIdAction(jobId: string): Promise<ApiResponse<Job>>
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
@@ -126,9 +116,9 @@ export async function getJobByIdAction(jobId: string): Promise<ApiResponse<Job>>
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error("Error in getJobByIdAction:", error);
+    logger.error("Error in getJobByIdAction", error, { action: "getJobByIdAction", jobId });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -147,7 +137,7 @@ export async function createJobAction(
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     // Get user ID from session
@@ -183,9 +173,9 @@ export async function createJobAction(
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error("Error in createJobAction:", error);
+    logger.error("Error in createJobAction", error, { action: "createJobAction" });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -206,7 +196,7 @@ export async function updateJobAction(
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
@@ -230,9 +220,9 @@ export async function updateJobAction(
 
     return { data: undefined };
   } catch (error) {
-    console.error("Error in updateJobAction:", error);
+    logger.error("Error in updateJobAction", error, { action: "updateJobAction", jobId });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }
@@ -249,7 +239,7 @@ export async function deleteJobAction(jobId: string): Promise<ApiResponse<void>>
     const token = await getAuthToken();
 
     if (!token) {
-      return { error: "Authentication required" };
+      return { error: MESSAGES.AUTH_REQUIRED };
     }
 
     const response = await fetch(
@@ -272,9 +262,9 @@ export async function deleteJobAction(jobId: string): Promise<ApiResponse<void>>
 
     return { data: undefined };
   } catch (error) {
-    console.error("Error in deleteJobAction:", error);
+    logger.error("Error in deleteJobAction", error, { action: "deleteJobAction", jobId });
     return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR,
     };
   }
 }

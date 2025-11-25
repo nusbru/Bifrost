@@ -1,3 +1,6 @@
+// Re-export API types for convenience
+export type { ApiResponse, ProblemDetails } from "./api";
+
 export enum JobApplicationStatus {
   NotApplied = 0,
   Applied = 1,

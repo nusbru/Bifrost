@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { Job, UserInfo } from "@/lib/types";
-import { getUserJobs } from "@/lib/api/jobs";
-import { createJobApplication } from "@/lib/api/job-applications";
+import { useAuth } from "@/lib/hooks";
+import { Job } from "@/lib/types";
+import { getUserJobsAction } from "@/lib/actions/jobs";
+import { createJobApplicationAction } from "@/lib/actions/job-applications";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -18,49 +18,27 @@ import Link from "next/link";
  * Follows Single Responsibility Principle - manages application creation
  */
 export default function NewApplicationPage() {
+  const { user, isLoading: authLoading } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    fetchJobs();
-  }, [router]);
+    if (user) {
+      fetchJobs();
+    }
+  }, [user]);
 
   const fetchJobs = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Check authentication
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/auth/login");
-        return;
-      }
-
-      // Get user info from localStorage
-      const storedUserInfo = localStorage.getItem("userInfo");
-      if (!storedUserInfo) {
-        router.push("/auth/login");
-        return;
-      }
-
-      const parsedUserInfo: UserInfo = JSON.parse(storedUserInfo);
-      setUserInfo(parsedUserInfo);
-
-      // Fetch user's jobs
-      const jobsResponse = await getUserJobs(
-        parsedUserInfo.id,
-        parsedUserInfo.accessToken
-      );
+      // Fetch user's jobs using server action
+      const jobsResponse = await getUserJobsAction();
 
       if (jobsResponse.error) {
         setError(jobsResponse.error);
@@ -80,7 +58,7 @@ export default function NewApplicationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!userInfo || !selectedJobId) {
+    if (!selectedJobId) {
       setError("Please select a job");
       return;
     }
@@ -89,11 +67,7 @@ export default function NewApplicationPage() {
       setIsSubmitting(true);
       setError(null);
 
-      const response = await createJobApplication(
-        userInfo.id,
-        selectedJobId,
-        userInfo.accessToken
-      );
+      const response = await createJobApplicationAction(selectedJobId);
 
       if (response.error) {
         setError(response.error);
@@ -111,7 +85,7 @@ export default function NewApplicationPage() {
     }
   };
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

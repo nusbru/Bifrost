@@ -113,7 +113,7 @@ describe("TopMenu Component", () => {
 
     await waitFor(() => {
       expect(mockSignOut).toHaveBeenCalledTimes(1);
-      expect(localStorage.removeItem).toHaveBeenCalledWith("userInfo");
+      // Session is now handled by Supabase cookies, no localStorage
       expect(mockPush).toHaveBeenCalledWith("/auth/login");
     });
   });

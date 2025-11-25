@@ -22,9 +22,10 @@ export function TopMenu({ className = "" }: TopMenuProps) {
     try {
       const supabase = createClient();
       await supabase.auth.signOut();
-      localStorage.removeItem("userInfo");
+      // Session is automatically cleared from cookies
       router.push("/auth/login");
     } catch (error) {
+      // Error is logged automatically if using logger, but we can keep this for immediate feedback
       console.error("Logout error:", error);
     }
   };
