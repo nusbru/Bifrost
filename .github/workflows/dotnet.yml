@@ -3,8 +3,14 @@ name: Build and Test
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'src/web/**'
+      - '.github/workflows/nextjs.yml'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'src/web/**'
+      - '.github/workflows/nextjs.yml'
 
 jobs:
   build:
