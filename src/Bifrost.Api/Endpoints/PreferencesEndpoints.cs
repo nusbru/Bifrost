@@ -13,7 +13,8 @@ public static class PreferencesEndpoints
     {
         var group = app.MapGroup("/api/preferences")
             .WithTags("Preferences")
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization();
 
         group.MapPost("/", CreatePreferences)
             .WithName("CreatePreferences")

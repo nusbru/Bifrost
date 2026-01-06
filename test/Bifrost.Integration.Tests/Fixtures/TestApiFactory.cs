@@ -3,6 +3,7 @@ using Bifrost.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 
@@ -16,6 +17,13 @@ public class TestApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private PostgreSqlContainer? _postgreSqlContainer;
     private bool _initialized = false;
+
+    /// <summary>
+    /// Test JWT configuration values.
+    /// </summary>
+    public const string TestJwtKey = "ThisIsATestSecretKeyForIntegrationTestsMinimum32Chars!";
+    public const string TestJwtIssuer = "Bifrost";
+    public const string TestJwtAudience = "BifrostApp";
 
     /// <summary>
     /// Initializes the test container before any tests run.
@@ -56,6 +64,17 @@ public class TestApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     /// </summary>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Add JWT configuration for testing
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:Key"] = TestJwtKey,
+                ["Jwt:Issuer"] = TestJwtIssuer,
+                ["Jwt:Audience"] = TestJwtAudience
+            });
+        });
+
         builder.ConfigureServices(services =>
         {
             if (_postgreSqlContainer == null)

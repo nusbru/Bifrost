@@ -13,7 +13,8 @@ public static class JobEndpoints
     {
         var group = app.MapGroup("/api/jobs")
             .WithTags("Jobs")
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization();
 
         group.MapPost("/", CreateJob)
             .WithName("CreateJob")

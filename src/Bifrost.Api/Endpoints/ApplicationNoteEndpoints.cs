@@ -13,7 +13,8 @@ public static class ApplicationNoteEndpoints
     {
         var group = app.MapGroup("/api/applications/{applicationId}/notes")
             .WithTags("Application Notes")
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization();
 
         group.MapPost("/", CreateNote)
             .WithName("CreateApplicationNote")

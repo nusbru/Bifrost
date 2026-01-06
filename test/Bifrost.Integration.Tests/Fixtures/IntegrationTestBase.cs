@@ -1,4 +1,4 @@
-using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using Bifrost.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
@@ -43,8 +43,31 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         Client = Factory.CreateClient();
         DbContext = Factory.GetDbContext();
 
+        // Set up default JWT authentication for the test user
+        SetAuthorizationHeader(TestUserId);
+
         // Clear database for test isolation
         await Factory.ClearDatabaseAsync();
+    }
+
+    /// <summary>
+    /// Sets the JWT authorization header for the HTTP client.
+    /// </summary>
+    /// <param name="userId">The user ID to include in the JWT token.</param>
+    protected void SetAuthorizationHeader(Guid userId)
+    {
+        var token = JwtTokenGenerator.GenerateToken(userId);
+        Client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+    }
+
+    /// <summary>
+    /// Clears the JWT authorization header from the HTTP client.
+    /// Useful for testing unauthorized access scenarios.
+    /// </summary>
+    protected void ClearAuthorizationHeader()
+    {
+        Client.DefaultRequestHeaders.Authorization = null;
     }
 
     /// <summary>
