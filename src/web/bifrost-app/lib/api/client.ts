@@ -12,7 +12,7 @@ export class ApiClient {
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       let problemDetails: ProblemDetails | undefined;
-      
+
       try {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
@@ -23,11 +23,11 @@ export class ApiClient {
       }
 
       const error = new Error(
-        problemDetails?.detail || 
-        problemDetails?.title || 
+        problemDetails?.detail ||
+        problemDetails?.title ||
         `HTTP ${response.status}: ${response.statusText}`
       ) as ApiError;
-      
+
       error.status = response.status;
       error.problemDetails = problemDetails;
       throw error;
