@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { TopMenu } from "@/components/top-menu";
 import { useRouter, usePathname } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { authService } from "@/lib/api/auth";
 
 // Mock next/navigation
 jest.mock("next/navigation", () => ({
@@ -9,14 +9,15 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),
 }));
 
-// Mock Supabase client
-jest.mock("@/lib/supabase/client", () => ({
-  createClient: jest.fn(),
+// Mock auth service
+jest.mock("@/lib/api/auth", () => ({
+  authService: {
+    logout: jest.fn(),
+  },
 }));
 
 describe("TopMenu Component", () => {
   const mockPush = jest.fn();
-  const mockSignOut = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -26,12 +27,6 @@ describe("TopMenu Component", () => {
     });
 
     (usePathname as jest.Mock).mockReturnValue("/dashboard");
-
-    (createClient as jest.Mock).mockReturnValue({
-      auth: {
-        signOut: mockSignOut,
-      },
-    });
 
     // Mock localStorage
     Object.defineProperty(window, "localStorage", {
@@ -103,7 +98,7 @@ describe("TopMenu Component", () => {
   });
 
   it("should handle logout correctly", async () => {
-    mockSignOut.mockResolvedValue({});
+    (authService.logout as jest.Mock).mockResolvedValue(undefined);
 
     render(<TopMenu />);
 
@@ -112,8 +107,7 @@ describe("TopMenu Component", () => {
     fireEvent.click(logoutButton);
 
     await waitFor(() => {
-      expect(mockSignOut).toHaveBeenCalledTimes(1);
-      // Session is now handled by Supabase cookies, no localStorage
+      expect(authService.logout).toHaveBeenCalledTimes(1);
       expect(mockPush).toHaveBeenCalledWith("/auth/login");
     });
   });
@@ -121,7 +115,7 @@ describe("TopMenu Component", () => {
   it("should handle logout error gracefully", async () => {
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     const logoutError = new Error("Logout failed");
-    mockSignOut.mockRejectedValue(logoutError);
+    (authService.logout as jest.Mock).mockRejectedValue(logoutError);
 
     render(<TopMenu />);
 

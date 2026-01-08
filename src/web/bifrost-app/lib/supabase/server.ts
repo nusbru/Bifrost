@@ -1,34 +1,67 @@
-import { createServerClient } from "@supabase/ssr";
+/**
+ * Server-side authentication helper
+ * Placeholder for server-side session management
+ * TODO: Implement proper server-side authentication with JWT tokens
+ */
+
 import { cookies } from "next/headers";
 
+export interface ServerSession {
+  access_token: string;
+  user: {
+    id: string;
+    email: string;
+  };
+}
+
 /**
- * Especially important if using Fluid compute: Don't put this client in a
- * global variable. Always create a new client within each function when using
- * it.
+ * Get the current session from cookies (server-side)
+ * This is a placeholder implementation
+ */
+export async function getServerSession(): Promise<ServerSession | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("bifrost_access_token")?.value;
+  const userJson = cookieStore.get("bifrost_user")?.value;
+
+  if (!token || !userJson) {
+    return null;
+  }
+
+  try {
+    const user = JSON.parse(userJson);
+    return {
+      access_token: token,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Create a placeholder createClient function for compatibility
+ * Reads authentication from cookies set by the client
  */
 export async function createClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
-            );
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have proxy refreshing
-            // user sessions.
-          }
-        },
+  return {
+    auth: {
+      getSession: async () => {
+        const session = await getServerSession();
+        return {
+          data: { session },
+          error: null,
+        };
+      },
+      getUser: async () => {
+        const session = await getServerSession();
+        return {
+          data: { user: session?.user || null },
+          error: null,
+        };
       },
     },
-  );
+  };
 }

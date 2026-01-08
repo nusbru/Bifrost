@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { authService } from "@/lib/api/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,24 +28,20 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      await authService.login({
         email,
         password,
       });
-      if (error) throw error;
-
-      // Session is automatically stored in cookies by Supabase
-      // No need to manually store tokens in localStorage
 
       // Redirect to dashboard after successful login
       router.push("/dashboard");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      // Show generic authentication error for security
+      setError("Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     }

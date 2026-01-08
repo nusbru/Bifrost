@@ -8,12 +8,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { User } from "@supabase/supabase-js";
+import { authService } from "@/lib/api/auth";
+import type { UserInfo } from "@/lib/api/types";
 import { ROUTES } from "@/lib/constants";
 
 interface UseAuthReturn {
-  user: User | null;
+  user: UserInfo | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
@@ -37,7 +37,7 @@ interface UseAuthReturn {
  */
 export function useAuth(): UseAuthReturn {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -46,17 +46,14 @@ export function useAuth(): UseAuthReturn {
 
   async function checkAuth() {
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const currentUser = authService.getCurrentUser();
 
-      if (!user) {
+      if (!currentUser) {
         router.push(ROUTES.LOGIN);
         return;
       }
 
-      setUser(user);
+      setUser(currentUser);
     } catch (_error) {
       router.push(ROUTES.LOGIN);
     } finally {

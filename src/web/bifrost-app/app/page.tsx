@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { authService } from "@/lib/api/auth";
 import { Loader2 } from "lucide-react";
 
 export default function Home() {
@@ -10,13 +10,11 @@ export default function Home() {
 
   useEffect(() => {
     async function checkAuth() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      // Check if user is authenticated
+      const isAuthenticated = authService.isAuthenticated();
 
       // Redirect authenticated users to dashboard, others to login
-      if (user) {
+      if (isAuthenticated) {
         router.push("/dashboard");
       } else {
         router.push("/auth/login");

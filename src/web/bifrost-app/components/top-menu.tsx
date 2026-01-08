@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { authService } from "@/lib/api/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { LogOut, BriefcaseIcon, ListIcon, SettingsIcon } from "lucide-react";
@@ -20,9 +20,7 @@ export function TopMenu({ className = "" }: TopMenuProps) {
 
   const handleLogout = async () => {
     try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-      // Session is automatically cleared from cookies
+      await authService.logout();
       router.push("/auth/login");
     } catch (error) {
       // Error is logged automatically if using logger, but we can keep this for immediate feedback
