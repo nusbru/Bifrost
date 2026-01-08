@@ -119,6 +119,7 @@ public class Program
         app.UseAuthorization();
 
         // Map API endpoints
+        app.MapAuthEndpoints();
         app.MapJobEndpoints();
         app.MapJobApplicationEndpoints();
         app.MapApplicationNoteEndpoints();

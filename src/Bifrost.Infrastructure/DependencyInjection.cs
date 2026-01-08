@@ -1,4 +1,6 @@
 using Bifrost.Core.Repositories;
+using Bifrost.Core.Services;
+using Bifrost.Infrastructure.Authentication;
 using Bifrost.Infrastructure.Persistence;
 using Bifrost.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +31,9 @@ public static class DependencyInjection
         services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
         services.AddScoped<IApplicationNoteRepository, ApplicationNoteRepository>();
         services.AddScoped<IPreferencesRepository, PreferencesRepository>();
+
+        // Register authentication service
+        services.AddHttpClient<IAuthService, AuthService>();
 
         return services;
     }

@@ -6,16 +6,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
+using WireMock.Server;
 
 namespace Bifrost.Integration.Tests.Fixtures;
 
 /// <summary>
 /// WebApplicationFactory for integration testing the Bifrost API.
-/// Configures a PostgreSQL Testcontainer for realistic database testing with proper isolation.
+/// Configures PostgreSQL Testcontainer and WireMock server for realistic testing with proper isolation.
+/// WireMock mocks Supabase authentication endpoints.
 /// </summary>
 public class TestApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private PostgreSqlContainer? _postgreSqlContainer;
+    private WireMockServer? _wireMockServer;
     private bool _initialized = false;
 
     /// <summary>
@@ -24,15 +27,29 @@ public class TestApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     public const string TestJwtKey = "ThisIsATestSecretKeyForIntegrationTestsMinimum32Chars!";
     public const string TestJwtIssuer = "Bifrost";
     public const string TestJwtAudience = "BifrostApp";
+    
+    /// <summary>
+    /// Test Supabase configuration values.
+    /// </summary>
+    public const string TestSupabaseKey = "test-supabase-key-for-integration-tests";
+    
+    /// <summary>
+    /// Gets the WireMock server URL for Supabase API mocking.
+    /// </summary>
+    public string WireMockUrl => _wireMockServer?.Urls.FirstOrDefault() ?? "http://localhost:0";
 
     /// <summary>
-    /// Initializes the test container before any tests run.
+    /// Initializes the test containers before any tests run.
     /// This must be called before using the factory.
     /// </summary>
     public async Task InitializeAsync()
     {
         if (_initialized)
             return;
+
+        // Initialize WireMock server for Supabase API mocking
+        _wireMockServer = WireMockServer.Start();
+        WireMockSupabaseHelper.ConfigureSupabaseAuthEndpoints(_wireMockServer, TestSupabaseKey);
 
         // Initialize PostgreSQL container with default settings
         _postgreSqlContainer = new PostgreSqlBuilder()
@@ -48,30 +65,45 @@ public class TestApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     }
 
     /// <summary>
-    /// Cleans up the test container after all tests complete.
+    /// Cleans up the test containers after all tests complete.
     /// </summary>
     public new async Task DisposeAsync()
     {
+        if (_wireMockServer != null)
+        {
+            _wireMockServer.Stop();
+            _wireMockServer.Dispose();
+        }
+        
         if (_postgreSqlContainer != null)
         {
             await _postgreSqlContainer.DisposeAsync();
         }
+        
         await base.DisposeAsync();
     }
 
     /// <summary>
-    /// Configures the WebHost to use PostgreSQL Testcontainer for testing.
+    /// Configures the WebHost to use PostgreSQL Testcontainer and WireMock for testing.
     /// </summary>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // Add JWT configuration for testing
+        if (_wireMockServer == null)
+        {
+            throw new InvalidOperationException(
+                "WireMock server not initialized. Call InitializeAsync() before using the factory.");
+        }
+
+        // Add JWT and Supabase configuration for testing
         builder.ConfigureAppConfiguration((context, config) =>
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Jwt:Key"] = TestJwtKey,
                 ["Jwt:Issuer"] = TestJwtIssuer,
-                ["Jwt:Audience"] = TestJwtAudience
+                ["Jwt:Audience"] = TestJwtAudience,
+                ["Supabase:Url"] = WireMockUrl,  // Point to WireMock instead of real Supabase
+                ["Supabase:Key"] = TestSupabaseKey
             });
         });
 

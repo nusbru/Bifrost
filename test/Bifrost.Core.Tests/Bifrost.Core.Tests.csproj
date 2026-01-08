@@ -10,6 +10,8 @@
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.2"/>
         <PackageReference Include="FluentAssertions" Version="6.12.1"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.1"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
         <PackageReference Include="NSubstitute" Version="5.1.0"/>
         <PackageReference Include="xunit" Version="2.9.2"/>
@@ -22,6 +24,7 @@
 
     <ItemGroup>
         <ProjectReference Include="../../src/Bifrost.Core/Bifrost.Core.csproj"/>
+        <ProjectReference Include="../../src/Bifrost.Infrastructure/Bifrost.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>
