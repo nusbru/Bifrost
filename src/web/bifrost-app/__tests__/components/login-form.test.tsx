@@ -86,9 +86,11 @@ describe("LoginForm Component", () => {
       accessToken: mockToken,
       refreshToken: mockRefreshToken,
       expiresIn: 3600,
+      tokenType: "Bearer",
       user: {
         id: mockUserId,
         email: mockEmail,
+        createdAt: new Date().toISOString(),
       },
     });
 
@@ -121,9 +123,11 @@ describe("LoginForm Component", () => {
       accessToken: "mock-token",
       refreshToken: "mock-refresh",
       expiresIn: 3600,
+      tokenType: "Bearer",
       user: {
         id: "mock-user-id",
         email: "test@example.com",
+        createdAt: new Date().toISOString(),
       },
     });
 
@@ -150,7 +154,8 @@ describe("LoginForm Component", () => {
         accessToken: "token",
         refreshToken: "refresh",
         expiresIn: 3600,
-        user: { id: "id", email: "test@example.com" }
+        tokenType: "Bearer",
+        user: { id: "id", email: "test@example.com", createdAt: new Date().toISOString() }
       }), 100))
     );
 
@@ -175,7 +180,8 @@ describe("LoginForm Component", () => {
       accessToken: "token",
       refreshToken: "refresh",
       expiresIn: 3600,
-      user: { id: "id", email: "test@example.com" },
+      tokenType: "Bearer",
+      user: { id: "id", email: "test@example.com", createdAt: new Date().toISOString() },
     });
 
     render(<LoginForm />);
