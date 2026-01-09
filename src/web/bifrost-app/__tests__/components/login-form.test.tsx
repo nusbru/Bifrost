@@ -89,7 +89,6 @@ describe("LoginForm Component", () => {
       user: {
         id: mockUserId,
         email: mockEmail,
-        createdAt: new Date().toISOString(),
       },
     });
 
@@ -125,7 +124,6 @@ describe("LoginForm Component", () => {
       user: {
         id: "mock-user-id",
         email: "test@example.com",
-        createdAt: new Date().toISOString(),
       },
     });
 
@@ -152,7 +150,7 @@ describe("LoginForm Component", () => {
         accessToken: "token",
         refreshToken: "refresh",
         expiresIn: 3600,
-        user: { id: "id", email: "test@example.com", createdAt: new Date().toISOString() }
+        user: { id: "id", email: "test@example.com" }
       }), 100))
     );
 
@@ -177,7 +175,7 @@ describe("LoginForm Component", () => {
       accessToken: "token",
       refreshToken: "refresh",
       expiresIn: 3600,
-      user: { id: "id", email: "test@example.com", createdAt: new Date().toISOString() },
+      user: { id: "id", email: "test@example.com" },
     });
 
     render(<LoginForm />);
