@@ -39,7 +39,7 @@ export function LoginForm({
 
       // Redirect to dashboard after successful login
       router.push("/dashboard");
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       // Show generic authentication error for security
       setError("Invalid email or password. Please try again.");
     } finally {

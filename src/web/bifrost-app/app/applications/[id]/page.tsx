@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/hooks";
 import {
@@ -39,13 +39,7 @@ export default function ApplicationDetailsPage() {
   const params = useParams();
   const applicationId = params.id ? String(params.id) : null;
 
-  useEffect(() => {
-    if (user && applicationId) {
-      fetchApplicationDetails();
-    }
-  }, [user, applicationId]);
-
-  const fetchApplicationDetails = async () => {
+  const fetchApplicationDetails = useCallback(async () => {
     if (!applicationId) return;
 
     try {
@@ -83,7 +77,13 @@ export default function ApplicationDetailsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [applicationId]);
+
+  useEffect(() => {
+    if (user && applicationId) {
+      fetchApplicationDetails();
+    }
+  }, [user, applicationId, fetchApplicationDetails]);
 
   const handleStatusUpdate = async (e: React.FormEvent) => {
     e.preventDefault();

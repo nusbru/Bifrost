@@ -5,7 +5,7 @@
 
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/hooks";
 import { getJobByIdAction, updateJobAction } from "@/lib/actions/jobs";
@@ -47,13 +47,7 @@ export default function EditJobPage() {
     offerRelocation: false,
   });
 
-  useEffect(() => {
-    if (user && jobId) {
-      fetchJob();
-    }
-  }, [user, jobId]);
-
-  const fetchJob = async () => {
+  const fetchJob = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -83,7 +77,13 @@ export default function EditJobPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [jobId]);
+
+  useEffect(() => {
+    if (user && jobId) {
+      fetchJob();
+    }
+  }, [user, jobId, fetchJob]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

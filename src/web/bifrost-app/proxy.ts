@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-export async function proxy(request: NextRequest) {
+export async function proxy(_request: NextRequest) {
   // No longer need to update Supabase session
   // Just pass through the request
   return NextResponse.next();

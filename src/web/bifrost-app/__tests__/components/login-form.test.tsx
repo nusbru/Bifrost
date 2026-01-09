@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { LoginForm } from "@/components/login-form";
 import { useRouter } from "next/navigation";
-import { authService } from "@/lib/api/auth";
+import { authService as _authService } from "@/lib/api/auth";
 
 // Mock next/navigation
 jest.mock("next/navigation", () => ({
