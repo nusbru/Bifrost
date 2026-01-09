@@ -1,5 +1,12 @@
 # 🌈 Bifrost: Your Job Search Companion
 
+[![Bifrost API Build and Test](https://github.com/nusbru/Bifrost/actions/workflows/dotnet.yml/badge.svg)](https://github.com/nusbru/Bifrost/actions/workflows/dotnet.yml)
+[![Bifrost Web Build and Test](https://github.com/nusbru/Bifrost/actions/workflows/nextjs.yml/badge.svg)](https://github.com/nusbru/Bifrost/actions/workflows/nextjs.yml)
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js)](https://nextjs.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 Welcome to **Bifrost**! 👋
 
 Job hunting can feel overwhelming. Between juggling spreadsheets, sticky notes, and endless email threads, it's easy to lose track of opportunities or forget important details from that interview last week.
