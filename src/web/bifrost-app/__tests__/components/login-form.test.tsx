@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { LoginForm } from "@/components/login-form";
 import { useRouter } from "next/navigation";
-import { authService as _authService } from "@/lib/api/auth";
+import { authService } from "@/lib/api/auth";
 
 // Mock next/navigation
 jest.mock("next/navigation", () => ({
@@ -56,20 +56,8 @@ describe("LoginForm Component", () => {
   });
 
   it("should display error message on failed login", async () => {
-    const { createClient } = require("@/lib/supabase/client");
-    const errorMessage = "Invalid login credentials";
-    const mockError = new Error(errorMessage);
-
-    const mockSignIn = jest.fn().mockResolvedValue({
-      data: { session: null, user: null },
-      error: mockError,
-    });
-
-    createClient.mockReturnValue({
-      auth: {
-        signInWithPassword: mockSignIn,
-      },
-    });
+    const mockLogin = authService.login as jest.MockedFunction<typeof authService.login>;
+    mockLogin.mockRejectedValue(new Error("Invalid login credentials"));
 
     render(<LoginForm />);
 
@@ -83,7 +71,7 @@ describe("LoginForm Component", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(errorMessage)).toBeInTheDocument();
+      expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();
     });
   });
 
@@ -93,25 +81,15 @@ describe("LoginForm Component", () => {
     const mockUserId = "mock-user-id-uuid";
     const mockEmail = "test@example.com";
 
-    const { createClient } = require("@/lib/supabase/client");
-
-    const mockSignIn = jest.fn().mockResolvedValue({
-      data: {
-        session: {
-          access_token: mockToken,
-          refresh_token: mockRefreshToken,
-        },
-        user: {
-          id: mockUserId,
-          email: mockEmail,
-        },
-      },
-      error: null,
-    });
-
-    createClient.mockReturnValue({
-      auth: {
-        signInWithPassword: mockSignIn,
+    const mockLogin = authService.login as jest.MockedFunction<typeof authService.login>;
+    mockLogin.mockResolvedValue({
+      accessToken: mockToken,
+      refreshToken: mockRefreshToken,
+      expiresIn: 3600,
+      user: {
+        id: mockUserId,
+        email: mockEmail,
+        createdAt: new Date().toISOString(),
       },
     });
 
@@ -126,9 +104,9 @@ describe("LoginForm Component", () => {
     await user.type(passwordInput, "password123");
     await user.click(submitButton);
 
-    // Verify that signInWithPassword was called successfully
+    // Verify that authService.login was called successfully
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledWith({
+      expect(mockLogin).toHaveBeenCalledWith({
         email: mockEmail,
         password: "password123",
       });
@@ -136,32 +114,18 @@ describe("LoginForm Component", () => {
 
     // Verify no error is displayed
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-
-    // Session is automatically stored in cookies by Supabase (not localStorage)
-    // Verify localStorage is NOT used for session storage
-    expect(localStorage.setItem).not.toHaveBeenCalled();
   });
 
   it("should redirect to dashboard after successful login", async () => {
-    const { createClient } = require("@/lib/supabase/client");
-
-    const mockSignIn = jest.fn().mockResolvedValue({
-      data: {
-        session: {
-          access_token: "mock-token",
-          refresh_token: "mock-refresh",
-        },
-        user: {
-          id: "mock-user-id",
-          email: "test@example.com",
-        },
-      },
-      error: null,
-    });
-
-    createClient.mockReturnValue({
-      auth: {
-        signInWithPassword: mockSignIn,
+    const mockLogin = authService.login as jest.MockedFunction<typeof authService.login>;
+    mockLogin.mockResolvedValue({
+      accessToken: "mock-token",
+      refreshToken: "mock-refresh",
+      expiresIn: 3600,
+      user: {
+        id: "mock-user-id",
+        email: "test@example.com",
+        createdAt: new Date().toISOString(),
       },
     });
 
@@ -182,23 +146,15 @@ describe("LoginForm Component", () => {
   });
 
   it("should disable submit button during login", async () => {
-    const { createClient } = require("@/lib/supabase/client");
-
-    const mockSignIn = jest.fn().mockImplementation(() =>
+    const mockLogin = authService.login as jest.MockedFunction<typeof authService.login>;
+    mockLogin.mockImplementation(() =>
       new Promise((resolve) => setTimeout(() => resolve({
-        data: {
-          session: { access_token: "token", refresh_token: "refresh" },
-          user: { id: "id", email: "test@example.com" }
-        },
-        error: null
+        accessToken: "token",
+        refreshToken: "refresh",
+        expiresIn: 3600,
+        user: { id: "id", email: "test@example.com", createdAt: new Date().toISOString() }
       }), 100))
     );
-
-    createClient.mockReturnValue({
-      auth: {
-        signInWithPassword: mockSignIn,
-      },
-    });
 
     render(<LoginForm />);
 
@@ -215,20 +171,13 @@ describe("LoginForm Component", () => {
     });
   });
 
-  it("should call Supabase signInWithPassword with correct credentials", async () => {
-    const { createClient } = require("@/lib/supabase/client");
-    const mockSignIn = jest.fn().mockResolvedValue({
-      data: {
-        session: { access_token: "token", refresh_token: "refresh" },
-        user: { id: "id", email: "test@example.com" },
-      },
-      error: null,
-    });
-
-    createClient.mockReturnValue({
-      auth: {
-        signInWithPassword: mockSignIn,
-      },
+  it("should call authService.login with correct credentials", async () => {
+    const mockLogin = authService.login as jest.MockedFunction<typeof authService.login>;
+    mockLogin.mockResolvedValue({
+      accessToken: "token",
+      refreshToken: "refresh",
+      expiresIn: 3600,
+      user: { id: "id", email: "test@example.com", createdAt: new Date().toISOString() },
     });
 
     render(<LoginForm />);
@@ -246,7 +195,7 @@ describe("LoginForm Component", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledWith({
+      expect(mockLogin).toHaveBeenCalledWith({
         email: testEmail,
         password: testPassword,
       });
