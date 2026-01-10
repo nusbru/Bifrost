@@ -580,3 +580,7 @@ sketch
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,rider,visualstudiocode,openframeworks+visualstudio,aspnetcore,dotnetcore,react,nextjs
+
+
+# Custom ignores below this line
+*.Development.json
